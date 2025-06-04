@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Ocorrências</title>
+</head>
+<body>
+  <h1>Ocorrências Registradas</h1>
+  <ul id="ocorrenciasList"></ul>
+
+  <h2>Voltar</h2>
+  <a href="./main.html"> clique aqui </a>
+
+  <script>
+    async function carregarOcorrencias() {
+      const res = await fetch('http://localhost:3000/ocorrencias'); // ou /ocorrencias, dependendo da rota
+      const ocorrencias = await res.json();
+
+      const lista = document.getElementById('ocorrenciasList');
+      lista.innerHTML = '';
+
+      ocorrencias.forEach(oc => {
+        const item = document.createElement('li');
+        item.innerHTML = `<strong>${oc.nome}</strong>: ${oc.descricao}`;
+        lista.appendChild(item);
+      });
+    }
+
+    carregarOcorrencias();
+  </script>
+</body>
+</html>

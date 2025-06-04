@@ -1,7 +1,9 @@
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { AuthModule } from './auth/auth.module';
+import { OcorrenciasModule } from './ocorrencias/ocorrencias.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { AuthModule } from './auth/auth.module';
     }),
 
     AuthModule,
+
+    OcorrenciasModule, 
 
     
   ],

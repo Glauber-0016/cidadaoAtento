@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registrar Ocorrência</title>
+</head>
+<body>
+  <h1>Registrar Ocorrência</h1>
+  <form id="occurrenceForm">
+    <input type="text" id="name" placeholder="Nome" required /><br />
+    <textarea id="description" placeholder="Descrição" required></textarea><br />
+    <button type="submit">Salvar</button>
+  </form>
+
+  <h2>Voltar</h2>
+  <a href="./main.html"> clique aqui </a>
+
+  <script>
+    document.getElementById('occurrenceForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const description = document.getElementById('description').value;
+
+      const res = await fetch('http://localhost:3000/ocorrencias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          nome: name,
+          descricao: description
+        })
+      });
+
+      const data = await res.json();
+      alert('Ocorrência registrada com sucesso!');
+      document.getElementById('occurrenceForm').reset();
+    });
+  </script>
+</body>
+</html>
