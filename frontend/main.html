@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Página Principal</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="registrar_ocorrencia.html">Registrar Ocorrência</a></li>
+      <li><a href="ver_ocorrencia.html">Ver Ocorrências</a></li>      
+    </ul>
+  </nav>
+  <h1> AAAAAAAAAHHHHHHHH </h1>
+
+  <script>
+    
+    if (!localStorage.getItem('userId')) {
+      window.location.href = 'index.html';
+    }
+
+    function logout() {
+      localStorage.removeItem('userId');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
