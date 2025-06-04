@@ -1,4 +1,3 @@
-
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -9,11 +8,18 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
-  async register(username: string, password: string) {
+  async register(username: string, password: string, cpf: string, email: string) {
     const existing = await this.userRepo.findOne({ where: { username } });
     if (existing) throw new Error('Usuário já existe');
+
+    const existing1 = await this.userRepo.findOne({ where: { cpf } });
+    if (existing1) throw new Error('cpf já existe');
+
+    const existing2 = await this.userRepo.findOne({ where: { email } });
+    if (existing2) throw new Error('email já existe');
+
     const hash = await bcrypt.hash(password, 10);
-    const user = this.userRepo.create({ username, password: hash });
+    const user = this.userRepo.create({ username, password: hash, cpf, email });
     return this.userRepo.save(user);
   }
 

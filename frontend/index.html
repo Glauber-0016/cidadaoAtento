@@ -1,21 +1,43 @@
-<!DOCTYPE html>
-<html>
-<head lang="pt-br">
+ <!DOCTYPE html>
+<html lang="pt-br">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Login</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body>
-  <form id="loginForm">
-    <input type="text" id="username" placeholder="Usuário" required />
-    <input type="password" id="password" placeholder="Senha" required />
-    <button type="submit">Entrar</button>
-  </form>
 
-  <h2>Ainda n tem conta?</h2>
-  <a href="./register.html"> registre-se </a>
+<body>
+
+  <div class="formulario">
+    <!-- Cabeçalho com título e logo -->
+    <div class="header-titulo">
+      <h1 class="titulo-principal">CIDADÃO<br>ATENTO</h1>
+      <img src="assets/icons/Logobrancasemfundo.png" alt="Logo" class="logo-titulo">
+    </div>
+
+    <!-- Subtítulo -->
+    <div class="form-group">
+      <h3>Login</h3>
+
+      <!-- Formulário de login -->
+      <form id="loginForm">
+        <input type="text" id="username" placeholder="Usuário ou CPF" required />
+        <input type="password" id="password" placeholder="Senha" required />
+
+        <div class="botoes-coluna">
+          <button type="submit">Entrar</button>
+        </div>
+      </form>
+
+      <!-- Link para cadastro -->
+      <div class="registrar-link">
+        <p>Ainda não tem conta?</p>
+        <a href="register.html">Registre-se</a>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

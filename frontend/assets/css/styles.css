@@ -1,0 +1,131 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+/*----------------------*/
+/* BASE                 */
+/*----------------------*/
+body {
+    font-family: 'Inter', sans-serif;
+    background-image: url('../images/Predios.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/*----------------------*/
+/* CABEÇALHO            */
+/*----------------------*/
+.header-titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.titulo-principal {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 1.2;
+}
+
+.logo-titulo {
+    width: 60px;
+    height: 60px;
+}
+
+/*----------------------*/
+/* FORMULÁRIO           */
+/*----------------------*/
+.formulario {
+    background-color: #022534;
+    color: #ffffff;
+    width: 450px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.form-group h3 {
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Inputs */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    font-size: 16px;
+}
+
+form input::placeholder {
+    color: #999;
+}
+
+/* Botões */
+.botoes-coluna {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+button {
+    width: 100%;
+    background-color: #0099AA;
+    color: #000000;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background-color: #007a88;
+}
+
+button:active {
+    background-color: #005f66;
+    transform: scale(0.98);
+}
+
+/* Link de cadastro */
+.registrar-link {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.registrar-link p {
+    margin-bottom: 4px;
+}
+
+.registrar-link a {
+    color: #00ccff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.registrar-link a:hover {
+    text-decoration: underline;
+}

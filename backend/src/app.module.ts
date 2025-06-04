@@ -13,7 +13,7 @@ import { OcorrenciasModule } from './ocorrencias/ocorrencias.module';
       port: 3306,
       username: 'root',
       password: 'root',
-      database: 'login_app',
+      database: 'cidadao_atento',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),

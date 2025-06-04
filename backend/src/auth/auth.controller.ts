@@ -8,9 +8,9 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() body: { username: string; password: string }, @Res() res: Response) {
+  async register(@Body() body: { username: string; password: string, cpf: string, email: string }, @Res() res: Response) {
     try {
-      const user = await this.authService.register(body.username, body.password);
+      const user = await this.authService.register(body.username, body.password, body.cpf, body.email);
       res.status(HttpStatus.CREATED).json({ message: 'Usuário criado', user });
     } catch (err) {
       res.status(HttpStatus.BAD_REQUEST).json({ message: err.message });

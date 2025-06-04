@@ -1,0 +1,159 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Fonte padrão */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: url('../images/Predios.png') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: transparent; /* Sem fundo */
+    padding: 15px 50px;
+}
+
+header .logo {
+    display: flex;
+    align-items: center;
+}
+
+header .logo h1 {
+    font-size: 20px;
+    color: white;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: #00BFFF;
+}
+/* Hero Section */
+.hero {
+    display: flex;
+    align-items: center;
+    height: 60vh;
+    padding: 0 0 0 50px;
+    text-align: left;
+}
+
+.hero-content {
+    max-width: 600px;
+    background-color: transparent; /* Fundo transparente */
+    margin-left: -45px;
+}
+
+.hero-content h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.hero-content p {
+    margin-bottom: 25px;
+    line-height: 1.6;
+    font-size: 18px;
+}
+
+.hero-content button {
+    padding: 12px 25px;
+    background-color: #0099AA;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.hero-content button:hover {
+    background-color: #009FCC;
+}
+
+
+/* Cards Section */
+.cards {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 40px 50px;
+}
+
+.card {
+    background-color: #022534;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+}
+
+.card h3 {
+    color: #00BFFF;
+    margin-bottom: 10px;
+}
+
+.card p {
+    line-height: 1.4;
+}
+
+/* Footer */
+footer {
+    background-color: #022534;
+    display: flex;
+    justify-content: space-between;
+    padding: 30px 50px;
+    flex-wrap: wrap;
+}
+
+footer .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+footer .footer-logo img {
+    width: 50px;
+}
+
+footer h4 {
+    margin-bottom: 10px;
+}
+
+footer ul {
+    list-style: none;
+}
+
+footer ul li {
+    margin-bottom: 5px;
+}
+
+footer ul li a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+footer ul li a:hover {
+    color: #0099AA;
+}
+
+footer p {
+    line-height: 1.4;
+}

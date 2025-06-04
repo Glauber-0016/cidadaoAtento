@@ -5,15 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Cadastro</title>
-  <link rel="stylesheet" href="styles.css">
-
+  <link rel="stylesheet" href="assets/css/styles.css">
 </head>
+
 <body>
-  <form id="registerForm">
-    <input type="text" id="username" placeholder="Usuário" required />
-    <input type="password" id="password" placeholder="Senha" required />
-    <button type="submit">Cadastrar</button>
-  </form>
+
+  <div class="formulario">
+    <!-- Cabeçalho com título e logo -->
+    <div class="header-titulo">
+      <h1 class="titulo-principal">CIDADÃO<br>ATENTO</h1>
+      <img src="./imagens/logo_64x64.png" alt="Logo" class="logo-titulo">
+    </div>
+
+    <!-- Subtítulo -->
+    <div class="form-group">
+      <h3>Cadastro</h3>
+
+      <!-- Formulário -->
+      <form id="registerForm">
+        <input type="text" id="username" placeholder="Usuário" required />
+        <input type="password" id="password" placeholder="Senha" required />
+        <input type="text" id="cpf" placeholder="Cpf" required />
+        <input type="email" id="email" placeholder="Email" required />
+
+        <div class="botoes-coluna">
+          <button type="submit">Cadastrar</button>
+          
+        </div>
+        <div class="registrar-link">
+        <a href="index.html">Efetuar login</a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
