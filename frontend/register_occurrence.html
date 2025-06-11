@@ -1,39 +1,98 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <title>Registrar Ocorrência</title>
+
+  <link rel="stylesheet" href="../leaflet/node_modules/leaflet/dist/leaflet.css" />
+  <script src="../leaflet/node_modules/leaflet/dist/leaflet.js"></script>
+
+  <style>
+    #map {
+      height: 300px;
+      width: 600px;
+    }
+
+  </style>
 </head>
+
 <body>
   <h1>Registrar Ocorrência</h1>
   <form id="occurrenceForm">
     <input type="text" id="name" placeholder="Nome" required /><br />
     <textarea id="description" placeholder="Descrição" required></textarea><br />
+    <div id="map"></div>
+    <input type="hidden" id="latitude" name="latitude">
+    <input type="hidden" id="longitude" name="longitude">
     <button type="submit">Salvar</button>
   </form>
 
   <h2>Voltar</h2>
-  <a href="./main.html"> clique aqui </a>
+  <a href="./pages/main.html"> clique aqui </a>
 
   <script>
+    //Configuração do mapa
+    var map = L.map('map').setView([-11.302755, -41.85585], 14);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    var marker = L.marker([-11.302755, -41.85585]).addTo(map);
+
+    function onMapClick(e) {
+      if (marker) {
+          marker.setLatLng(e.latlng); // Move o marcador existente
+      } else {
+          marker = L.marker(e.latlng).addTo(map); // Cria novo marcador
+      }
+
+      document.getElementById('latitude').value = e.latlng.lat;
+      document.getElementById('longitude').value = e.latlng.lng;
+    }
+    map.on('click', onMapClick);
+
+    //Interação com o Banco de Dados
     document.getElementById('occurrenceForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('name').value;
       const description = document.getElementById('description').value;
+      const latitude = document.getElementById('latitude').value;
+      const longitude = document.getElementById('longitude').value;
 
-      const res = await fetch('http://localhost:3000/ocorrencias', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          nome: name,
-          descricao: description
-        })
-      });
+      try {
+        const res = await fetch('http://localhost:3000/ocorrencias', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            nome: name,
+            descricao: description,
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude)
+          })
+        });
 
-      const data = await res.json();
-      alert('Ocorrência registrada com sucesso!');
-      document.getElementById('occurrenceForm').reset();
+        if (!res.ok) {
+            throw new Error('Erro ao registrar ocorrência');
+        }
+
+        const data = await res.json();
+        alert('Ocorrência registrada com sucesso!');
+        document.getElementById('occurrenceForm').reset();
+
+        if (marker) {
+          map.removeLayer(marker);
+          marker = null;
+        }
+
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao registrar ocorrência. Por favor, tente novamente.');
+      }
     });
+
   </script>
 </body>
 </html>

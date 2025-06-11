@@ -11,6 +11,12 @@ export class Ocorrencias {
 
   @Column()
   descricao: string;
+
+  @Column('decimal', {precision: 10, scale: 6})
+  latitude: number;
+
+  @Column('decimal', {precision: 10, scale: 6})
+  longitude: number;
 }
 
 
