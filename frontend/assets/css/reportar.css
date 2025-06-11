@@ -1,0 +1,130 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  font-family: 'Arial', sans-serif;
+  background-color: #f2f4f8;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  background-color: #003b4f;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  font-size: 20px;
+  margin-bottom: 30px;
+}
+
+.sidebar nav button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  margin: 15px 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sidebar nav button.active,
+.sidebar nav button:hover {
+  transform: scale(1.1);
+}
+
+.sidebar footer {
+  text-align: center;
+}
+
+.sidebar footer img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+}
+
+.conteudo {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.formulario {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.formulario h2 {
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: #003b4f;
+}
+
+.formulario label {
+  display: block;
+  margin-bottom: 8px;
+  margin-top: 16px;
+  font-weight: bold;
+}
+
+.formulario input,
+.formulario textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.botoes {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.botoes button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.voltar {
+  background-color: #ccc;
+  color: #000;
+}
+
+.enviar {
+  background-color: #007a88;
+  color: white;
+}
+
+.rodape {
+  display: flex;
+  justify-content: space-between;
+  padding: 40px;
+  background-color: #003b4f;
+  color: white;
+  margin-top: 40px;
+}
+
+.rodape a {
+  color: #fff;
+  text-decoration: underline;
+}

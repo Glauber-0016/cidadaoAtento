@@ -1,38 +1,90 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Registrar Ocorrência</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reportar Incidente</title>
+  <link rel="stylesheet" href="./assets/css/reportar.css" />
 </head>
 <body>
-  <h1>Registrar Ocorrência</h1>
-  <form id="occurrenceForm">
-    <input type="text" id="name" placeholder="Nome" required /><br />
-    <textarea id="description" placeholder="Descrição" required></textarea><br />
-    <button type="submit">Salvar</button>
-  </form>
 
-  <h2>Voltar</h2>
-  <a href="./main.html"> clique aqui </a>
+  <aside class="sidebar">
+    <h2>Cidadão Atento</h2>
+    <nav>
+      <button onclick="location.href='main.html'">🏠</button>
+      <button class="active">📄</button>
+      <button onclick="location.href='ocorrencias.html'">🔍</button>
+      <button>❓</button>
+    </nav>
+    <footer>
+      <img src="./imagens/logo_64x64.png" alt="Logo" />
+      <p>Juntos construímos uma cidade melhor.</p>
+    </footer>
+  </aside>
+
+  <main class="conteudo">
+    <section class="formulario">
+      <h2>Reporte um incidente</h2>
+      <form id="occurrenceForm">
+        <label for="description">Descrição</label>
+        <textarea id="description" placeholder="Descreva o incidente..." required></textarea>
+
+        <label for="date">Data</label>
+        <input type="date" id="date" required />
+
+        <label for="location">Localização</label>
+        <input type="text" id="location" placeholder="Digite a localização" required />
+
+        <label for="photo">Foto</label>
+        <input type="file" id="photo" />
+
+        <div class="botoes">
+          <button type="button" class="voltar" onclick="location.href='main.html'">Voltar</button>
+          <button type="submit" class="enviar">Enviar</button>
+        </div>
+      </form>
+    </section>
+
+    <footer class="rodape">
+      <div>
+        <h3>Links úteis</h3>
+        <p><a href="#">Registrar ocorrência</a></p>
+        <p><a href="#">Minhas ocorrências</a></p>
+        <p><a href="#">Termos de Uso</a></p>
+      </div>
+      <div>
+        <h3>Contato</h3>
+        <p>suporte@cidadaoatento.com</p>
+        <p>(00) 00000-0000</p>
+      </div>
+    </footer>
+  </main>
 
   <script>
     document.getElementById('occurrenceForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('name').value;
       const description = document.getElementById('description').value;
+      const date = document.getElementById('date').value;
+      const location = document.getElementById('location').value;
 
-      const res = await fetch('http://localhost:3000/ocorrencias', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          nome: name,
-          descricao: description
-        })
-      });
+      try {
+        const res = await fetch('http://localhost:3000/ocorrencias', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            descricao: description,
+            data: date,
+            local: location
+          })
+        });
 
-      const data = await res.json();
-      alert('Ocorrência registrada com sucesso!');
-      document.getElementById('occurrenceForm').reset();
+        if (!res.ok) throw new Error('Erro ao registrar ocorrência');
+
+        alert('Ocorrência registrada com sucesso!');
+        document.getElementById('occurrenceForm').reset();
+      } catch (err) {
+        alert('Erro: ' + err.message);
+      }
     });
   </script>
 </body>
