@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 
 <head>
   <meta charset="UTF-8" />
-  <title>Registrar Ocorrência</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reportar Incidente</title>
 
   <link rel="stylesheet" href="../leaflet/node_modules/leaflet/dist/leaflet.css" />
   <script src="../leaflet/node_modules/leaflet/dist/leaflet.js"></script>
@@ -15,21 +16,48 @@
     }
 
   </style>
+  <link rel="stylesheet" href="./assets/css/reportar.css" />
 </head>
 
 <body>
-  <h1>Registrar Ocorrência</h1>
-  <form id="occurrenceForm">
-    <input type="text" id="name" placeholder="Nome" required /><br />
-    <textarea id="description" placeholder="Descrição" required></textarea><br />
-    <div id="map"></div>
-    <input type="hidden" id="latitude" name="latitude">
-    <input type="hidden" id="longitude" name="longitude">
-    <button type="submit">Salvar</button>
-  </form>
-
-  <h2>Voltar</h2>
-  <a href="./pages/main.html"> clique aqui </a>
+  <div class="container">
+    <aside class="sidebar">
+  <h2>Cidadão Atento</h2>
+  <nav>
+    <ul>
+      <li><a href="./pages/main.html">🏠</a></li>
+      <li class="active"><a href="./register_occurrence.html">📝</a></li>
+      <li><a href="./listar_ocorrencias.html">🔍</a></li>
+      <li><a href="#">❓</a></li>
+    </ul>
+  </nav>
+  <footer>
+    <img src="assets/icons/Logobrancasemfundo.png" alt="Logo" />
+    <p>Juntos construímos uma cidade melhor.</p>
+    <div class="links">
+      <p><strong>Links úteis</strong><br>Registrar ocorrência<br>Minhas ocorrências<br>Termos de Uso</p>
+      <p><strong>Contato</strong><br>suporte@cidadaoatento.com<br>(00)00000-0000</p>
+    </div>
+  </footer>
+</aside>
+    <main class="content">
+      <section class="formulario">
+        <h2>Reporte um incidente</h2>
+          <form id="occurrenceForm">
+          <input type="text" id="name" placeholder="Nome" required /><br />
+          <textarea id="description" placeholder="Descrição" required></textarea><br />
+ 
+          <div class="botoes">
+            <button type="button" class="voltar" onclick="location.href='main.html'">Voltar</button>
+            <div id="map"></div>
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+            <button type="submit" class="enviar">Enviar</button>
+          </div>
+        </form>
+      </section>
+    </pages/main>
+  </div>
 
   <script>
     //Configuração do mapa

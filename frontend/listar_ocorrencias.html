@@ -1,28 +1,80 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Lista de Ocorrências</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cidadão Atento</title>
+  <link rel="stylesheet" href="./assets/css/listar.css" />
 </head>
 <body>
-  <h1>Ocorrências Registradas</h1>
-  <ul id="ocorrenciasList"></ul>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Cidadão Atento</h2>
+      <nav>
+        <ul>
+          <li><a href="./pages/main.html">🏠</a></li>
+          <li><a href="./register_occurrence.html">📝</a></li>
+          <li class="active"><span>🔍</span></li>
+          <li><span>❓</span></li>
+        </ul>
+      </nav>
+      <footer>
+        <img src="assets/icons/Logobrancasemfundo.png" alt="Logo" />
+        <p>Juntos construímos uma cidade melhor.</p>
+        <div class="links">
+          <p><strong>Links úceis</strong><br>Registrar ocorrência<br>Minhas ocorrências<br>Termos de Uso</p>
+          <p><strong>Contato</strong><br>suporte@cidadaoatento.com<br>(00)00000-0000</p>
+        </div>
+      </footer>
+    </aside>
 
-  <h2>Voltar</h2>
-  <a href="./pages/main.html"> clique aqui </a>
+    <main class="content">
+      <h2>Ocorrências</h2>
+      <div class="card-list" id="ocorrenciasList">
+        <!-- Ocorrências carregadas dinamicamente -->
+      </div>
+    </main>
+  </div>
 
   <script>
     async function carregarOcorrencias() {
-      const res = await fetch('http://localhost:3000/ocorrencias'); // ou /ocorrencias, dependendo da rota
+      const res = await fetch('http://localhost:3000/ocorrencias');
       const ocorrencias = await res.json();
 
       const lista = document.getElementById('ocorrenciasList');
       lista.innerHTML = '';
 
       ocorrencias.forEach(oc => {
-        const item = document.createElement('li');
-        item.innerHTML = `<strong>${oc.nome}</strong>: ${oc.descricao}`;
-        lista.appendChild(item);
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const status = document.createElement('div');
+        status.className = 'card-status pendente';
+        status.textContent = '🟡 Pendente';
+
+        const body = document.createElement('div');
+        body.className = 'card-body';
+
+        const img = document.createElement('img');
+        img.src = 'imagens/ocorrencia1.jpg';
+
+        const info = document.createElement('div');
+        const title = document.createElement('h4');
+        title.textContent = oc.nome || 'Sem título';
+
+        const desc = document.createElement('p');
+        desc.textContent = oc.descricao || 'Sem descrição';
+
+        info.appendChild(title);
+        info.appendChild(desc);
+
+        body.appendChild(img);
+        body.appendChild(info);
+
+        card.appendChild(status);
+        card.appendChild(body);
+
+        lista.appendChild(card);
       });
     }
 
