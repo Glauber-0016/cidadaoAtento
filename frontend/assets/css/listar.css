@@ -1,10 +1,11 @@
-
+/* Reset básico */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Fonte base */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f4f4f4;
@@ -92,69 +93,60 @@ body {
   margin-bottom: 20px;
 }
 
-/* Formulário de incidente */
-.formulario {
+/* Cards de Ocorrências */
+.card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.card {
   background-color: white;
-  padding: 25px;
   border-radius: 8px;
+  overflow: hidden;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
 }
 
-.formulario label {
-  display: block;
-  margin-top: 15px;
+.card-status {
   font-weight: bold;
+  padding: 8px;
+  text-align: center;
 }
 
-.formulario input[type="text"],
-.formulario input[type="date"],
-.formulario input[type="file"],
-.formulario textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
+.card-status.pendente {
+  background-color: #ffe58f;
+  color: #b58d00;
 }
 
-.formulario textarea {
-  resize: vertical;
-  min-height: 100px;
+.card-status.andamento {
+  background-color: #91d5ff;
+  color: #0050b3;
 }
 
-/* Botões */
-.botoes {
+.card-status.resolvido {
+  background-color: #b7eb8f;
+  color: #237804;
+}
+
+.card-body {
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+  gap: 12px;
+  padding: 15px;
 }
 
-.botoes button {
-  padding: 10px 20px;
-  border: none;
+.card-body img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
   border-radius: 6px;
-  font-weight: bold;
+}
+
+.card-body h4 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.card-body p {
   font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.botoes .voltar {
-  background-color: #ccc;
-  color: #333;
-}
-
-.botoes .voltar:hover {
-  background-color: #bbb;
-}
-
-.botoes .enviar {
-  background-color: #0099aa;
-  color: white;
-}
-
-.botoes .enviar:hover {
-  background-color: #007e8a;
+  color: #666;
 }
