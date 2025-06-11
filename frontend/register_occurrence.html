@@ -12,14 +12,14 @@
   <h2>Cidadão Atento</h2>
   <nav>
     <ul>
-      <li><a href="main.html">🏠</a></li>
-      <li class="active"><a href="reportar.html">📝</a></li>
-      <li><a href="ocorrencias.html">🔍</a></li>
+      <li><a href="./pages/main.html">🏠</a></li>
+      <li class="active"><a href="./register_occurrence.html">📝</a></li>
+      <li><a href="./listar_ocorrencias.html">🔍</a></li>
       <li><a href="#">❓</a></li>
     </ul>
   </nav>
   <footer>
-    <img src="./imagens/logo_64x64.png" alt="Logo" />
+    <img src="assets/icons/Logobrancasemfundo.png" alt="Logo" />
     <p>Juntos construímos uma cidade melhor.</p>
     <div class="links">
       <p><strong>Links úteis</strong><br>Registrar ocorrência<br>Minhas ocorrências<br>Termos de Uso</p>
@@ -27,24 +27,13 @@
     </div>
   </footer>
 </aside>
-
-
     <main class="content">
       <section class="formulario">
         <h2>Reporte um incidente</h2>
-        <form id="occurrenceForm">
-          <label for="description">Descrição</label>
-          <textarea id="description" placeholder="Descreva o incidente..." required></textarea>
-
-          <label for="date">Data</label>
-          <input type="date" id="date" required />
-
-          <label for="location">Localização</label>
-          <input type="text" id="location" placeholder="Digite a localização" required />
-
-          <label for="photo">Foto</label>
-          <input type="file" id="photo" />
-
+          <form id="occurrenceForm">
+          <input type="text" id="name" placeholder="Nome" required /><br />
+          <textarea id="description" placeholder="Descrição" required></textarea><br />
+ 
           <div class="botoes">
             <button type="button" class="voltar" onclick="location.href='main.html'">Voltar</button>
             <button type="submit" class="enviar">Enviar</button>
@@ -52,34 +41,26 @@
         </form>
       </section>
     </main>
-
   </div>
 
   <script>
     document.getElementById('occurrenceForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const name = document.getElementById('name').value;
       const description = document.getElementById('description').value;
-      const date = document.getElementById('date').value;
-      const location = document.getElementById('location').value;
 
-      try {
-        const res = await fetch('http://localhost:3000/ocorrencias', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            descricao: description,
-            data: date,
-            local: location
-          })
-        });
+      const res = await fetch('http://localhost:3000/ocorrencias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          nome: name,
+          descricao: description
+        })
+      });
 
-        if (!res.ok) throw new Error('Erro ao registrar ocorrência');
-
-        alert('Ocorrência registrada com sucesso!');
-        document.getElementById('occurrenceForm').reset();
-      } catch (err) {
-        alert('Erro: ' + err.message);
-      }
+      const data = await res.json();
+      alert('Ocorrência registrada com sucesso!');
+      document.getElementById('occurrenceForm').reset();
     });
   </script>
 </body>
