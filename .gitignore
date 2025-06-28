@@ -8,3 +8,5 @@ leaflet/
 
 # Ignorar logs e arquivos temporários
 *.log
+
+uploads/

@@ -17,6 +17,9 @@ export class Ocorrencias {
 
   @Column('decimal', {precision: 10, scale: 6})
   longitude: number;
+
+  @Column()
+  imagens: string;
 }
 
 

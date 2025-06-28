@@ -12,10 +12,10 @@
   <style>
     #map {
       height: 300px;
-      width: 600px;
+      width: 550px;
     }
-
   </style>
+  
   <link rel="stylesheet" href="./assets/css/reportar.css" />
 </head>
 
@@ -46,12 +46,16 @@
           <form id="occurrenceForm">
           <input type="text" id="name" placeholder="Nome" required /><br />
           <textarea id="description" placeholder="Descrição" required></textarea><br />
+
+          <!-- Inserção de imagens no forms -->
+          <input type="file" id="images" name="Imagens" multiple accept="image/*">
+
+          <div id="map"></div>
+          <input type="hidden" id="latitude" name="latitude">
+          <input type="hidden" id="longitude" name="longitude">
  
           <div class="botoes">
-            <button type="button" class="voltar" onclick="location.href='main.html'">Voltar</button>
-            <div id="map"></div>
-            <input type="hidden" id="latitude" name="latitude">
-            <input type="hidden" id="longitude" name="longitude">
+            <button type="button" class="voltar" onclick="location.href='pages/main.html'">Voltar</button>
             <button type="submit" class="enviar">Enviar</button>
           </div>
         </form>
@@ -82,6 +86,39 @@
     }
     map.on('click', onMapClick);
 
+
+    //Configuração do upload de imagens
+    var selectedImages = []; // Armazena as imagens
+
+    // Manipulador de seleção de imagens
+    document.getElementById('images').addEventListener('change', function(e) {
+      const files = e.target.files;
+      selectedImages = [];
+      
+      const maxFiles = Math.min(files.length, 5);
+      
+      for (let i = 0; i < maxFiles; i++) {
+        const file = files[i];
+        
+        if (!file.type.match('image.*')) { // Verifica se é uma imagem
+          continue;
+        }
+
+        if (file.size > 5 * 1024 * 1024) { // Verifica tamanho máximo (5MB)
+          alert(`A imagem ${file.name} excede o tamanho máximo de 5MB`);
+          continue;
+        }
+        
+        selectedImages.push(file);
+      }
+    });
+
+    // Função para remover imagem
+    function removeImage(index) {
+      selectedImages.splice(index, 1);
+    }
+
+    
     //Interação com o Banco de Dados
     document.getElementById('occurrenceForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -91,15 +128,19 @@
       const longitude = document.getElementById('longitude').value;
 
       try {
+        const formData = new FormData();
+        formData.append('nome', name);
+        formData.append('descricao', description);
+        formData.append('latitude', latitude);
+        formData.append('longitude', longitude);
+        
+        selectedImages.forEach((image, index) => {
+          formData.append('imagens', image);
+        });
+
         const res = await fetch('http://localhost:3000/ocorrencias', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            nome: name,
-            descricao: description,
-            latitude: parseFloat(latitude),
-            longitude: parseFloat(longitude)
-          })
+          body: formData
         });
 
         if (!res.ok) {
@@ -109,6 +150,8 @@
         const data = await res.json();
         alert('Ocorrência registrada com sucesso!');
         document.getElementById('occurrenceForm').reset();
+
+        selectedImages = [];
 
         if (marker) {
           map.removeLayer(marker);
