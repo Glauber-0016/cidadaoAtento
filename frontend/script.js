@@ -13,9 +13,18 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
   const data = await res.json();
   alert(data.message || 'Erro');
 
+  const allowedDomain = '@cidadaoatento.com';
+
   if (data.message === 'Login bem-sucedido') {
     localStorage.setItem('userId', data.userId);
-    window.location.href = 'pages/main.html'
+    localStorage.setItem('email', data.email)
+
+    if (data.email.endsWith(allowedDomain)) {
+      window.location.href = 'adm.html';
+    } else {
+      window.location.href = 'pages/main.html';
+    }
+
   }
 
 });

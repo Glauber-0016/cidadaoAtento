@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cidadão Atento</title>
+  <link rel="stylesheet" href="./assets/css/listar.css" />
+</head>
+<body>
+  
+
+    <main class="content">
+    <h2>Ocorrências</h2>
+
+    <div class="tabs">
+        <button class="tab active" data-status="todos">Todos</button>
+        <button class="tab" data-status="pendente">Pendente</button>
+        <button class="tab" data-status="concluido">Concluído</button>
+        <button class="tab" data-status="excluido">Excluído</button>
+    </div>
+
+    <div class="card-list" id="ocorrenciasList">
+    <!-- Ocorrências carregadas dinamicamente -->
+    </div>
+    </main>
+
+    </div>
+
+<script>
+    let todasOcorrencias = [];
+
+    function getStatusProps(status) {
+    switch (status) {
+        case 'pendente':
+            return { class: 'status-pendente', label: '🟡 Pendente' };
+        case 'concluido':
+            return { class: 'status-concluido', label: '🟢 Concluído' };
+        case 'excluido':
+            return { class: 'status-excluido', label: '🔴 Excluído' };
+        default:
+            return { class: 'status-pendente', label: '🟡 Pendente' };
+        }
+    }
+
+    async function carregarOcorrencias() {
+        const res = await fetch('http://localhost:3000/ocorrencias');
+        todasOcorrencias = await res.json();
+        renderOcorrencias('todos');
+    }
+
+    function renderOcorrencias(filtro) {
+        const lista = document.getElementById('ocorrenciasList');
+        lista.innerHTML = '';
+
+        const filtradas = todasOcorrencias.filter(oc => filtro === 'todos' || oc.status === filtro);
+
+        filtradas.forEach(oc => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        // Status banner
+        const statusDiv = document.createElement('div');
+        const statusProps = getStatusProps(oc.status);
+        statusDiv.className = `card-status ${statusProps.class}`;
+        statusDiv.textContent = statusProps.label;
+
+        // Corpo
+        const body = document.createElement('div');
+        body.className = 'card-body';
+
+        const img = document.createElement('img');
+        img.src = 'imagens/ocorrencia1.jpg';
+
+        const info = document.createElement('div');
+        const title = document.createElement('h4');
+        title.textContent = oc.nome || 'Sem título';
+
+        const desc = document.createElement('p');
+        desc.textContent = oc.descricao || 'Sem descrição';
+
+        info.appendChild(title);
+        info.appendChild(desc);
+
+        // Select para mudar status
+        const select = document.createElement('select');
+        select.innerHTML = `
+        <option value="pendente" ${oc.status === 'pendente' ? 'selected' : ''}>Pendente</option>
+        <option value="concluido" ${oc.status === 'concluido' ? 'selected' : ''}>Concluído</option>
+        <option value="excluido" ${oc.status === 'excluido' ? 'selected' : ''}>Excluído</option>
+        `;
+        select.addEventListener('change', () => atualizarStatus(oc.id, select.value));
+
+        body.appendChild(img);
+        body.appendChild(info);
+        body.appendChild(select);
+
+        card.appendChild(statusDiv);
+        card.appendChild(body);
+
+        lista.appendChild(card);
+    });
+  }
+
+    function atualizarStatus(id, novoStatus) {
+        // Muda na memória
+        const ocorrencia = todasOcorrencias.find(o => o.id === id);
+        if (ocorrencia) {
+        ocorrencia.status = novoStatus;
+        // Re-renderiza mantendo filtro atual
+        const abaAtiva = document.querySelector('.tab.active');
+        const statusAtual = abaAtiva ? abaAtiva.getAttribute('data-status') : 'todos';
+        renderOcorrencias(statusAtual);
+    }
+  }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Carrega dados
+        carregarOcorrencias();
+
+        // Abas de filtro
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const status = tab.getAttribute('data-status');
+        renderOcorrencias(status);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -28,6 +28,6 @@ export class AuthService {
     if (!user) throw new Error('Usuário não encontrado');
     const match = await bcrypt.compare(password, user.password);
     if (!match) throw new Error('Senha inválida');
-    return { message: 'Login bem-sucedido', userId: user.id };
+    return { message: 'Login bem-sucedido', userId: user.id, email: user.email };
   }
 }
