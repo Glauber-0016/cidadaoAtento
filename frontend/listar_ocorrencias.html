@@ -43,6 +43,29 @@
         color: #555;
         margin-top: 5px;
     }
+
+  .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: white;
+      text-transform: capitalize;
+    }
+    .status-badge.status-pendente { 
+        background-color: #ffc107; color: #333; 
+    }
+    .status-badge.status-em_andamento { 
+        background-color: #17a2b8; 
+    }
+    .status-badge.status-concluido { 
+        background-color: #28a745; 
+    }
+
+    .status-badge.status-excluido { 
+        background-color: #af4242; 
+    }
+
   </style>
 
 </head>
@@ -72,67 +95,65 @@
     <main class="content">
       <h2>Ocorrências</h2>
       <div class="card-list" id="ocorrenciasList">
-        <!-- Ocorrências carregadas dinamicamente -->
       </div>
     </main>
   </div>
 
-   <script>
+ <script>
     const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
+    const ocorrenciasList = document.getElementById('ocorrenciasList');
 
     async function carregarOcorrencias() {
-      const res = await fetch('http://localhost:3000/ocorrencias');
-      const ocorrencias = await res.json();
+        const res = await fetch('http://localhost:3000/ocorrencias');
+        
+        const ocorrencias = await res.json();
+        ocorrenciasList.innerHTML = ''; 
 
-      const lista = document.getElementById('ocorrenciasList');
-      lista.innerHTML = '';
+        ocorrencias.forEach(oc => {
+          const item = document.createElement('div');
+          item.className = 'occurrence-card';
+          const statusText = (oc.status || 'pendente').replace('_', ' ');
 
-      ocorrencias.forEach(oc => {
-        const item = document.createElement('div');
-        item.className = 'occurrence-card';
+          const cardHeaderHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong>${oc.nome}</strong>
+              <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+            </div>
+            <p>${oc.descricao}</p>
+          `;
+          item.innerHTML = cardHeaderHTML;
 
-        item.innerHTML = `<strong>${oc.nome}</strong>: <p>${oc.descricao}</p>`;
-
-        if (oc.imagens) {
-          const imageNames = oc.imagens.split(',').filter(Boolean);
-
-          if (imageNames.length > 0) {
-            imageNames.forEach(imageName => {
-              const imgElement = document.createElement('img');
-              imgElement.src = `${IMAGES_BASE_URL}${imageName.trim()}`;
-              imgElement.alt = `Imagem da ocorrência ${oc.nome}`;
-              imgElement.className = 'occurrence-image';
-              item.appendChild(imgElement);
-            });
+          if (oc.imagens) {
+            const imageNames = oc.imagens.split(',').filter(Boolean);
+            if (imageNames.length > 0) {
+              imageNames.forEach(imageName => {
+                const imgElement = document.createElement('img');
+                imgElement.src = `${IMAGES_BASE_URL}${imageName.trim()}`;
+                imgElement.alt = `Imagem da ocorrência ${oc.nome}`;
+                imgElement.className = 'occurrence-image';
+                item.appendChild(imgElement);
+              });
+            }
           }
-        }
 
-        if (oc.latitude && oc.longitude) {
-          const mapId = `map-${oc.id}`;
-          const mapContainer = document.createElement('div');
-          mapContainer.id = mapId;
-          mapContainer.className = 'occurrence-map';
-          item.appendChild(mapContainer);
-
-          setTimeout(() => {
+          if (oc.latitude && oc.longitude) {
+            const mapId = `map-${oc.id}`;
+            const mapContainer = document.createElement('div');
+            mapContainer.id = mapId;
+            mapContainer.className = 'occurrence-map';
+            item.appendChild(mapContainer);
+            setTimeout(() => {
               const map = L.map(mapId).setView([oc.latitude, oc.longitude], 14);
-
-              L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              }).addTo(map);
-
+              L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
               L.marker([oc.latitude, oc.longitude]).addTo(map);
-
               map.invalidateSize();
-          }, 0);
-        }
+            }, 0);
+          }
 
-        lista.appendChild(item);
-      });
-    }
-
+          ocorrenciasList.appendChild(item); 
+        });
+      } 
     carregarOcorrencias();
-  </script>
+</script>
 </body>
 </html>

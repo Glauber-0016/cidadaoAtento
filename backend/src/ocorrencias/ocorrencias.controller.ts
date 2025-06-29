@@ -1,5 +1,5 @@
 
-import { Controller, Post, Body, Get, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseInterceptors, UploadedFiles,Param,Patch,BadRequestException } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { OcorrenciasService } from './ocorrencias.service';
 import { Ocorrencias } from './ocorrencias.entity';
@@ -9,6 +9,15 @@ import { extname } from 'path';
 @Controller('ocorrencias')
 export class OcorrenciasController {
   constructor(private service: OcorrenciasService) {}
+  @Patch(':id/status')
+  async updateOccurrenceStatus(@Param('id') id: string, @Body() body: { status: string }) {
+    try {
+      const updatedOccurrence = await this.service.updateStatus(id, body.status); 
+      return updatedOccurrence;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
 
   @Post()
   @UseInterceptors(FilesInterceptor('imagens', 5, {

@@ -20,6 +20,9 @@ export class Ocorrencias {
 
   @Column()
   imagens: string;
+
+  @Column({ default: 'pendente' }) 
+  status: string;
 }
 
 

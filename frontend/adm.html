@@ -3,132 +3,217 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cidadão Atento</title>
+  <title>Cidadão Atento - Administrar</title>
   <link rel="stylesheet" href="./assets/css/listar.css" />
+
+  <link rel="stylesheet" href="../leaflet/node_modules/leaflet/dist/leaflet.css" />
+  <script src="../leaflet/node_modules/leaflet/dist/leaflet.js"></script>
+
+  <style>
+    .occurrence-map {
+      height: 150px;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+    .occurrence-image {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+    .occurrence-card {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background-color: #fff;
+    }
+    .occurrence-card strong {
+      color: #333;
+    }
+    .occurrence-card p {
+      color: #555;
+      margin-top: 5px;
+    }
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: white;
+      text-transform: capitalize;
+    }
+    .status-badge.status-pendente { 
+        background-color: #ffc107; color: #333; 
+    }
+    .status-badge.status-em_andamento { 
+        background-color: #17a2b8; 
+    }
+    .status-badge.status-concluido { 
+        background-color: #28a745; 
+    }
+
+    .status-badge.status-excluido { 
+        background-color: #af4242; 
+    }
+    
+    .status-update-form {
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .status-update-form select {
+      padding: 6px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .status-update-form button {
+      padding: 6px 12px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Cidadão Atento</h2>
+      <nav>
+        <ul>
+          <li><a href="./pages/main.html">🏠</a></li>
+          <li><a href="./register_occurrence.html">📝</a></li>
+          <li class="active"><span>🔍</span></li>
+          <li><span>❓</span></li>
+        </ul>
+      </nav>
+      <footer>
+        <img src="assets/icons/Logobrancasemfundo.png" alt="Logo" />
+        <p>Juntos construímos uma cidade melhor.</p>
+        <div class="links">
+          <p><strong>Links úteis</strong><br>Registrar ocorrência<br>Minhas ocorrências<br>Termos de Uso</p>
+          <p><strong>Contato</strong><br>suporte@cidadaoatento.com<br>(00)00000-0000</p>
+        </div>
+      </footer>
+    </aside>
 
     <main class="content">
-    <h2>Ocorrências</h2>
-
-    <div class="tabs">
-        <button class="tab active" data-status="todos">Todos</button>
-        <button class="tab" data-status="pendente">Pendente</button>
-        <button class="tab" data-status="concluido">Concluído</button>
-        <button class="tab" data-status="excluido">Excluído</button>
-    </div>
-
-    <div class="card-list" id="ocorrenciasList">
-    <!-- Ocorrências carregadas dinamicamente -->
-    </div>
+      <h2>Administrar Ocorrencias</h2>
+      <div class="card-list" id="ocorrenciasList">
+        </div>
     </main>
-
-    </div>
-
-<script>
-    let todasOcorrencias = [];
-
-    function getStatusProps(status) {
-    switch (status) {
-        case 'pendente':
-            return { class: 'status-pendente', label: '🟡 Pendente' };
-        case 'concluido':
-            return { class: 'status-concluido', label: '🟢 Concluído' };
-        case 'excluido':
-            return { class: 'status-excluido', label: '🔴 Excluído' };
-        default:
-            return { class: 'status-pendente', label: '🟡 Pendente' };
-        }
-    }
+  </div>
+  <script>
+    const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
+    const ocorrenciasList = document.getElementById('ocorrenciasList');
 
     async function carregarOcorrencias() {
-        const res = await fetch('http://localhost:3000/ocorrencias');
-        todasOcorrencias = await res.json();
-        renderOcorrencias('todos');
-    }
+      const res = await fetch('http://localhost:3000/ocorrencias');
+      const ocorrencias = await res.json();
 
-    function renderOcorrencias(filtro) {
-        const lista = document.getElementById('ocorrenciasList');
-        lista.innerHTML = '';
+      ocorrenciasList.innerHTML = ''; 
 
-        const filtradas = todasOcorrencias.filter(oc => filtro === 'todos' || oc.status === filtro);
+      ocorrencias.forEach(oc => {
+        const item = document.createElement('div');
+        item.className = 'occurrence-card';
+        const statusText = (oc.status || 'pendente').replace('_', ' ');
 
-        filtradas.forEach(oc => {
-        const card = document.createElement('div');
-        card.className = 'card';
-
-        // Status banner
-        const statusDiv = document.createElement('div');
-        const statusProps = getStatusProps(oc.status);
-        statusDiv.className = `card-status ${statusProps.class}`;
-        statusDiv.textContent = statusProps.label;
-
-        // Corpo
-        const body = document.createElement('div');
-        body.className = 'card-body';
-
-        const img = document.createElement('img');
-        img.src = 'imagens/ocorrencia1.jpg';
-
-        const info = document.createElement('div');
-        const title = document.createElement('h4');
-        title.textContent = oc.nome || 'Sem título';
-
-        const desc = document.createElement('p');
-        desc.textContent = oc.descricao || 'Sem descrição';
-
-        info.appendChild(title);
-        info.appendChild(desc);
-
-        // Select para mudar status
-        const select = document.createElement('select');
-        select.innerHTML = `
-        <option value="pendente" ${oc.status === 'pendente' ? 'selected' : ''}>Pendente</option>
-        <option value="concluido" ${oc.status === 'concluido' ? 'selected' : ''}>Concluído</option>
-        <option value="excluido" ${oc.status === 'excluido' ? 'selected' : ''}>Excluído</option>
+        const cardHeaderHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>${oc.nome}</strong>
+            <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+          </div>
+          <p>${oc.descricao}</p>
         `;
-        select.addEventListener('change', () => atualizarStatus(oc.id, select.value));
+        item.innerHTML = cardHeaderHTML;
 
-        body.appendChild(img);
-        body.appendChild(info);
-        body.appendChild(select);
+        if (oc.imagens) {
+          const imageNames = oc.imagens.split(',').filter(Boolean);
+          if (imageNames.length > 0) {
+            imageNames.forEach(imageName => {
+              const imgElement = document.createElement('img');
+              imgElement.src = `${IMAGES_BASE_URL}${imageName.trim()}`;
+              imgElement.alt = `Imagem da ocorrência ${oc.nome}`;
+              imgElement.className = 'occurrence-image';
+              item.appendChild(imgElement);
+            });
+          }
+        }
 
-        card.appendChild(statusDiv);
-        card.appendChild(body);
+        if (oc.latitude && oc.longitude) {
+          const mapId = `map-${oc.id}`;
+          const mapContainer = document.createElement('div');
+          mapContainer.id = mapId;
+          mapContainer.className = 'occurrence-map';
+          item.appendChild(mapContainer);
+          setTimeout(() => {
+            const map = L.map(mapId).setView([oc.latitude, oc.longitude], 14);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+            L.marker([oc.latitude, oc.longitude]).addTo(map);
+            map.invalidateSize();
+          }, 0);
+        }
 
-        lista.appendChild(card);
-    });
-  }
+        const formHTML = `
+          <form class="status-update-form" data-id="${oc.id}">
+            <input type="hidden" name="id" value="${oc.id}">
+            <select name="status">
+                <option value="pendente" ${oc.status === 'pendente' ? 'selected' : ''}>Pendente</option>
+                <option value="em_andamento" ${oc.status === 'em_andamento' ? 'selected' : ''}>Em Andamento</option>
+                <option value="concluido" ${oc.status === 'concluido' ? 'selected' : ''}>Concluído</option>
+                <option value="excluido" ${oc.status === 'excluido' ? 'selected' : ''}>Excluido</option>
+            </select>
+            <button type="submit">Atualizar</button>
+          </form>
+        `;
+        item.insertAdjacentHTML('beforeend', formHTML);
 
-    function atualizarStatus(id, novoStatus) {
-        // Muda na memória
-        const ocorrencia = todasOcorrencias.find(o => o.id === id);
-        if (ocorrencia) {
-        ocorrencia.status = novoStatus;
-        // Re-renderiza mantendo filtro atual
-        const abaAtiva = document.querySelector('.tab.active');
-        const statusAtual = abaAtiva ? abaAtiva.getAttribute('data-status') : 'todos';
-        renderOcorrencias(statusAtual);
-    }
-  }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // Carrega dados
-        carregarOcorrencias();
-
-        // Abas de filtro
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const status = tab.getAttribute('data-status');
-        renderOcorrencias(status);
+        ocorrenciasList.appendChild(item);
       });
-    });
-  });
-</script>
+    }
+    ocorrenciasList.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
+      const form = e.target;
+      if (!form.classList.contains('status-update-form')) {
+        return;
+      }
+      
+      const occurrenceId = form.dataset.id; 
+      const newStatus = form.querySelector('select[name="status"]').value;
+
+      const submitButton = form.querySelector('button');
+      submitButton.disabled = true;
+
+      try {
+        const res = await fetch(`http://localhost:3000/ocorrencias/${occurrenceId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+
+        if (res.ok) {
+          alert('Status atualizado com sucesso!');
+          carregarOcorrencias(); 
+        } else {
+          const errorData = await res.json();
+          throw new Error(errorData.message || 'O servidor retornou um erro.');
+        }
+      } catch (error) {
+        alert(`Falha ao atualizar: ${error.message}`);
+        submitButton.disabled = false;
+        submitButton.textContent = 'Atualizar';
+      }
+    });
+    carregarOcorrencias();
+  </script>
 </body>
 </html>
