@@ -12,7 +12,7 @@ import { OcorrenciasModule } from './ocorrencias/ocorrencias.module';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'root',
+      password: '01100',
       database: 'cidadao_atento',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
