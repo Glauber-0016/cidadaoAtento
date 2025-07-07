@@ -106,7 +106,10 @@
     async function carregarOcorrencias() {
         const res = await fetch('http://localhost:3000/ocorrencias');
         
-        const ocorrencias = await res.json();
+        const ocorrenciasGerais = await res.json();
+
+        const ocorrencias = ocorrenciasGerais.filter(oc => !oc.status || oc.status.toLowerCase() !== 'excluido');
+        
         ocorrenciasList.innerHTML = ''; 
 
         ocorrencias.forEach(oc => {
