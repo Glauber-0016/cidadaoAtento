@@ -110,7 +110,7 @@
 
         const ocorrencias = ocorrenciasGerais.filter(oc => !oc.status || oc.status.toLowerCase() !== 'excluido');
         
-        ocorrenciasList.innerHTML = ''; 
+        ocorrenciasList.innerHTML = '';
 
         ocorrencias.forEach(oc => {
           const item = document.createElement('div');
