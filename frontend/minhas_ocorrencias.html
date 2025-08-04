@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minhas Ocorrências - Cidadão Atento</title>
+  <link rel="stylesheet" href="./assets/css/listar.css" />
+  <link rel="stylesheet" href="../backend/node_modules/leaflet/dist/leaflet.css" />
+  <script src="../backend/node_modules/leaflet/dist/leaflet.js"></script>
+  
+  <style>
+
+    .occurrence-map {
+        height: 150px;
+        width: 100%;
+        max-width: 400px;
+        margin-top: 10px;
+        border-radius: 5px;
+    }
+
+    .occurrence-image {
+        max-width: 100%;
+        height: auto;
+        margin-top: 10px;
+        border-radius: 5px;
+    }
+
+    .occurrence-card {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        background-color: #fff;
+    }
+
+    .occurrence-card strong {
+        color: #333;
+    }
+
+    .occurrence-card p {
+        color: #555;
+        margin-top: 5px;
+    }
+
+  .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: white;
+      text-transform: capitalize;
+    }
+    .status-badge.status-pendente { 
+        background-color: #ffc107; color: #333; 
+    }
+    .status-badge.status-em_andamento { 
+        background-color: #17a2b8; 
+    }
+    .status-badge.status-concluido { 
+        background-color: #28a745; 
+    }
+
+    .status-badge.status-excluido { 
+        background-color: #af4242; 
+    }
+
+  </style>
+
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Cidadão Atento</h2>
+      <nav>
+        <ul>
+            <li><a href="./pages/main.html">🏠</a></li>
+            <li class="active"><a href="./register_occurrence.html">📝</a></li>
+            <li><a href="./listar_ocorrencias.html">🔍</a></li>
+            <li><a href="./minhas_ocorrencias.html">👔</a></li>
+            <li><a href="#">❓</a></li>
+        </ul>
+      </nav>
+      <footer>
+        <img src="./assets/icons/Logobrancasemfundo.png" alt="Logo" />
+        <p>Juntos construímos uma cidade melhor.</p>
+        <div class="links">
+          <p><strong>Links úteis</strong><br>Registrar ocorrência<br>Minhas ocorrências<br>Termos de Uso</p>
+          <p><strong>Contato</strong><br>suporte@cidadaoatento.com<br>(00)00000-0000</p>
+        </div>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <h2>Minhas Ocorrências</h2>
+      <div class="card-list" id="minhasOcorrenciasList"></div>
+    </main>
+  </div>
+
+  <script>
+    const USER_ID = 1; // Substitua pelo id do usuário logado
+    const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
+    const minhasOcorrenciasList = document.getElementById('minhasOcorrenciasList');
+
+    async function carregarMinhasOcorrencias() {
+      const res = await fetch('http://localhost:3000/ocorrencias');
+      const todasOcorrencias = await res.json();
+
+      const minhasOcorrencias = todasOcorrencias.filter(oc =>
+        oc.idUsuario === USER_ID && (!oc.status || oc.status.toLowerCase() !== 'excluido')
+      );
+
+      minhasOcorrenciasList.innerHTML = '';
+
+      minhasOcorrencias.forEach(oc => {
+        const item = document.createElement('div');
+        item.className = 'occurrence-card';
+        const statusText = (oc.status || 'pendente').replace('_', ' ');
+
+        item.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>${oc.nome}</strong>
+            <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+          </div>
+          <p>${oc.descricao}</p>
+        `;
+
+        if (oc.imagens) {
+          const imagens = oc.imagens.split(',').filter(Boolean);
+          imagens.forEach(img => {
+            const el = document.createElement('img');
+            el.src = IMAGES_BASE_URL + img.trim();
+            el.className = 'occurrence-image';
+            item.appendChild(el);
+          });
+        }
+
+        if (oc.latitude && oc.longitude) {
+          const mapId = `map-${oc.id}`;
+          const mapContainer = document.createElement('div');
+          mapContainer.id = mapId;
+          mapContainer.className = 'occurrence-map';
+          item.appendChild(mapContainer);
+
+          setTimeout(() => {
+            const map = L.map(mapId).setView([oc.latitude, oc.longitude], 14);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+            L.marker([oc.latitude, oc.longitude]).addTo(map);
+            map.invalidateSize();
+          }, 0);
+        }
+
+        minhasOcorrenciasList.appendChild(item);
+      });
+    }
+
+    carregarMinhasOcorrencias();
+  </script>
+</body>
+</html>
