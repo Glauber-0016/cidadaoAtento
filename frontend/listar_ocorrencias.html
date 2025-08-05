@@ -8,65 +8,59 @@
   <link rel="stylesheet" href="../backend/node_modules/leaflet/dist/leaflet.css" />
   <script src="../backend/node_modules/leaflet/dist/leaflet.js"></script>
 
-   <style>
+  <style>
 
-    .occurrence-map {
-        height: 150px;
-        width: 100%;
-        max-width: 400px;
-        margin-top: 10px;
-        border-radius: 5px;
+    .comment-section {
+      margin-top: 15px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+      max-height: 200px;
+      overflow-y: auto;
     }
 
-    .occurrence-image {
-        max-width: 100%;
-        height: auto;
-        margin-top: 10px;
-        border-radius: 5px;
+    .comment {
+      background-color: #f9f9f9;
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
     }
 
-    .occurrence-card {
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin-bottom: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        background-color: #fff;
+    .comment strong {
+      display: block;
+      color: #007BFF;
+      margin-bottom: 4px;
     }
 
-    .occurrence-card strong {
-        color: #333;
+    .comment-form {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
     }
 
-    .occurrence-card p {
-        color: #555;
-        margin-top: 5px;
+    .comment-form input[type="text"],
+    .comment-form textarea {
+      padding: 8px;
+      margin-bottom: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.9rem;
     }
 
-  .status-badge {
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.85em;
-      font-weight: bold;
+    .comment-form button {
+      align-self: flex-start;
+      padding: 6px 12px;
+      background-color: #0099AA;
       color: white;
-      text-transform: capitalize;
-    }
-    .status-badge.status-pendente { 
-        background-color: #ffc107; color: #333; 
-    }
-    .status-badge.status-em_andamento { 
-        background-color: #17a2b8; 
-    }
-    .status-badge.status-concluido { 
-        background-color: #28a745; 
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
-    .status-badge.status-excluido { 
-        background-color: #af4242; 
+    .comment-form button:hover {
+      background-color: #007c8a;
     }
-
   </style>
-
 </head>
 
 <body>
@@ -94,69 +88,117 @@
 
     <main class="content">
       <h2>Ocorrências</h2>
-      <div class="card-list" id="ocorrenciasList">
-      </div>
+      <div class="card-list" id="ocorrenciasList"></div>
     </main>
   </div>
 
- <script>
+  <script>
     const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
     const ocorrenciasList = document.getElementById('ocorrenciasList');
 
-    async function carregarOcorrencias() {
-        const res = await fetch('http://localhost:3000/ocorrencias');
-        
-        const ocorrenciasGerais = await res.json();
-
-        const ocorrencias = ocorrenciasGerais.filter(oc => !oc.status || oc.status.toLowerCase() !== 'excluido');
-        
-        ocorrenciasList.innerHTML = '';
-
-        ocorrencias.forEach(oc => {
-          const item = document.createElement('div');
-          item.className = 'occurrence-card';
-          const statusText = (oc.status || 'pendente').replace('_', ' ');
-
-          const cardHeaderHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong>${oc.nome}</strong>
-              <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
-            </div>
-            <p>${oc.descricao}</p>
-          `;
-          item.innerHTML = cardHeaderHTML;
-
-          if (oc.imagens) {
-            const imageNames = oc.imagens.split(',').filter(Boolean);
-            if (imageNames.length > 0) {
-              imageNames.forEach(imageName => {
-                const imgElement = document.createElement('img');
-                imgElement.src = `${IMAGES_BASE_URL}${imageName.trim()}`;
-                imgElement.alt = `Imagem da ocorrência ${oc.nome}`;
-                imgElement.className = 'occurrence-image';
-                item.appendChild(imgElement);
-              });
-            }
-          }
-
-          if (oc.latitude && oc.longitude) {
-            const mapId = `map-${oc.id}`;
-            const mapContainer = document.createElement('div');
-            mapContainer.id = mapId;
-            mapContainer.className = 'occurrence-map';
-            item.appendChild(mapContainer);
-            setTimeout(() => {
-              const map = L.map(mapId).setView([oc.latitude, oc.longitude], 14);
-              L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-              L.marker([oc.latitude, oc.longitude]).addTo(map);
-              map.invalidateSize();
-            }, 0);
-          }
-
-          ocorrenciasList.appendChild(item); 
+    async function carregarComentarios(ocorrenciaId, commentsContainer) {
+      try {
+        const res = await fetch(`http://localhost:3000/comentarios/${ocorrenciaId}`);
+        const comentarios = await res.json();
+        commentsContainer.innerHTML = '';
+        comentarios.forEach(c => {
+          const commentEl = document.createElement('div');
+          commentEl.className = 'comment';
+          commentEl.innerHTML = `<strong>${c.nome}</strong><p>${c.texto}</p>`;
+          commentsContainer.appendChild(commentEl);
         });
-      } 
+      } catch (err) {
+        commentsContainer.innerHTML = '<p>Erro ao carregar comentários.</p>';
+      }
+    }
+
+    async function carregarOcorrencias() {
+      const res = await fetch('http://localhost:3000/ocorrencias');
+      const ocorrenciasGerais = await res.json();
+      const ocorrencias = ocorrenciasGerais.filter(oc => !oc.status || oc.status.toLowerCase() !== 'excluido');
+      ocorrenciasList.innerHTML = '';
+
+      ocorrencias.forEach(oc => {
+        const item = document.createElement('div');
+        item.className = 'occurrence-card';
+        const statusText = (oc.status || 'pendente').replace('_', ' ');
+
+        item.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>${oc.nome}</strong>
+            <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+          </div>
+          <p>${oc.descricao}</p>
+        `;
+
+        if (oc.imagens) {
+          const imageNames = oc.imagens.split(',').filter(Boolean);
+          imageNames.forEach(imageName => {
+            const img = document.createElement('img');
+            img.src = `${IMAGES_BASE_URL}${imageName.trim()}`;
+            img.alt = `Imagem da ocorrência ${oc.nome}`;
+            img.className = 'occurrence-image';
+            item.appendChild(img);
+          });
+        }
+
+        if (oc.latitude && oc.longitude) {
+          const mapId = `map-${oc.id}`;
+          const mapContainer = document.createElement('div');
+          mapContainer.id = mapId;
+          mapContainer.className = 'occurrence-map';
+          item.appendChild(mapContainer);
+          setTimeout(() => {
+            const map = L.map(mapId).setView([oc.latitude, oc.longitude], 14);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+            L.marker([oc.latitude, oc.longitude]).addTo(map);
+            map.invalidateSize();
+          }, 0);
+        }
+
+        const commentSection = document.createElement('div');
+        commentSection.className = 'comment-section';
+
+        const commentsContainer = document.createElement('div');
+        commentsContainer.id = `comments-${oc.id}`;
+        commentSection.appendChild(commentsContainer);
+
+        const commentForm = document.createElement('form');
+        commentForm.className = 'comment-form';
+        commentForm.innerHTML = `
+          <input type="text" name="nome" placeholder="Seu nome" required />
+          <textarea name="texto" rows="2" placeholder="Seu comentário" required></textarea>
+          <button type="submit">Comentar</button>
+        `;
+        commentForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const nome = commentForm.nome.value;
+          const texto = commentForm.texto.value;
+          const body = { nome, texto, ocorrenciaId: oc.id };
+
+          const res = await fetch('http://localhost:3000/comentarios', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+
+          if (res.ok) {
+            commentForm.reset();
+            carregarComentarios(oc.id, commentsContainer);
+          } else {
+            alert('Erro ao enviar comentário.');
+          }
+        });
+
+        commentSection.appendChild(commentForm);
+        item.appendChild(commentSection);
+
+        ocorrenciasList.appendChild(item);
+        carregarComentarios(oc.id, commentsContainer);
+      });
+    }
+
     carregarOcorrencias();
-</script>
+  </script>
 </body>
 </html>
