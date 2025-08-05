@@ -10,6 +10,26 @@
   <script src="../leaflet/node_modules/leaflet/dist/leaflet.js"></script>
 
   <style>
+
+    .like-button {
+    cursor: pointer;
+    font-size: 22px;
+    color: #ccc;
+    transition: color 0.3s;
+    margin-left: 10px;
+    }
+
+    .like-button.liked {
+    color: red;
+    }
+
+    .like-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    }
+
     .occurrence-map {
       height: 150px;
       width: 100%;
@@ -126,12 +146,15 @@
         const statusText = (oc.status || 'pendente').replace('_', ' ');
 
         const cardHeaderHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <strong>${oc.nome}</strong>
-            <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
-          </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong>${oc.nome}</strong>
+          <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+        </div>
           <p>${oc.descricao}</p>
-        `;
+        <div class="like-container">
+            <span class="like-button" onclick="this.classList.toggle('liked')">&#10084;</span>
+        </div>`;
+
         item.innerHTML = cardHeaderHTML;
 
         if (oc.imagens) {
