@@ -93,10 +93,10 @@ body {
   margin-bottom: 20px;
 }
 
-/* Cards de Ocorrências */
+/* Cards de Ocorrências (CORRIGIDO) */
 .card-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: 1fr; /* Garante apenas UMA coluna */
   gap: 20px;
 }
 
@@ -182,3 +182,4 @@ body {
   border: 1px solid #ccc;
   cursor: pointer;
 }
+

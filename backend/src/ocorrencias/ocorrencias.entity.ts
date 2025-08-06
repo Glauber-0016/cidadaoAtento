@@ -1,5 +1,5 @@
 
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
 @Entity()
 export class Ocorrencias {
@@ -23,6 +23,9 @@ export class Ocorrencias {
 
   @Column({ default: 'pendente' }) 
   status: string;
+
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)', name: 'data_ocorrencia' })
+  data_ocorrencia: Date;
 }
 
 

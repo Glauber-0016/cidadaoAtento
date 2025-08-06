@@ -9,7 +9,6 @@
   <script src="../backend/node_modules/leaflet/dist/leaflet.js"></script>
 
   <style>
-
     .comment-section {
       margin-top: 15px;
       border-top: 1px solid #ccc;
@@ -17,7 +16,6 @@
       max-height: 200px;
       overflow-y: auto;
     }
-
     .comment {
       background-color: #f9f9f9;
       padding: 8px;
@@ -25,19 +23,16 @@
       border-radius: 6px;
       border: 1px solid #ddd;
     }
-
     .comment strong {
       display: block;
       color: #007BFF;
       margin-bottom: 4px;
     }
-
     .comment-form {
       display: flex;
       flex-direction: column;
       margin-top: 10px;
     }
-
     .comment-form input[type="text"],
     .comment-form textarea {
       padding: 8px;
@@ -46,7 +41,6 @@
       border-radius: 4px;
       font-size: 0.9rem;
     }
-
     .comment-form button {
       align-self: flex-start;
       padding: 6px 12px;
@@ -56,10 +50,72 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
     .comment-form button:hover {
       background-color: #007c8a;
     }
+    .filters {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .filter-group label {
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    .filter-group select,
+    .filter-group input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+    .status-pendente { background-color: #ffc107; color: #333; }
+    .status-em_andamento { background-color: #17a2b8; }
+    .status-concluido { background-color: #28a745; }
+    .status-rejeitado { background-color: #dc3545; }
+
+    main.content .card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .occurrence-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid #e0e0e0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px; /* Espaço entre os elementos internos do card */
+    }
+    .occurrence-image {
+        width: 100%;
+        height: auto;
+        border-radius: 6px;
+    }
+    .occurrence-map {
+        height: 180px;
+        border-radius: 6px;
+    }
+
   </style>
 </head>
 
@@ -88,6 +144,23 @@
 
     <main class="content">
       <h2>Ocorrências</h2>
+      
+      <div class="filters">
+        <div class="filter-group">
+          <label for="filter-status">Filtrar por Status</label>
+          <select id="filter-status">
+            <option value="">Todos</option>
+            <option value="pendente">Pendente</option>
+            <option value="em_andamento">Em Andamento</option>
+            <option value="concluido">Concluído</option>
+            <option value="rejeitado">Rejeitado</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter-data">Filtrar por Data</label>
+          <input type="date" id="filter-data" />
+        </div>
+      </div>
       <div class="card-list" id="ocorrenciasList"></div>
     </main>
   </div>
@@ -95,6 +168,11 @@
   <script>
     const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
     const ocorrenciasList = document.getElementById('ocorrenciasList');
+    
+    const filterStatus = document.getElementById('filter-status');
+    const filterData = document.getElementById('filter-data');
+
+    let todasAsOcorrencias = []; 
 
     async function carregarComentarios(ocorrenciaId, commentsContainer) {
       try {
@@ -112,25 +190,39 @@
       }
     }
 
-    async function carregarOcorrencias() {
-      const res = await fetch('http://localhost:3000/ocorrencias');
-      const ocorrenciasGerais = await res.json();
-      const ocorrencias = ocorrenciasGerais.filter(oc => !oc.status || oc.status.toLowerCase() !== 'excluido');
-      ocorrenciasList.innerHTML = '';
+    function renderOcorrencias(ocorrencias) {
+      ocorrenciasList.innerHTML = ''; 
+      
+      if (ocorrencias.length === 0) {
+        ocorrenciasList.innerHTML = '<p style="text-align: center;">Nenhuma ocorrência encontrada com os filtros selecionados.</p>';
+        return;
+      }
 
       ocorrencias.forEach(oc => {
+        // --- JAVASCRIPT CORRIGIDO ---
         const item = document.createElement('div');
-        item.className = 'occurrence-card';
+        item.className = 'occurrence-card'; // Voltamos a usar a classe correta
+        
         const statusText = (oc.status || 'pendente').replace('_', ' ');
+        const statusClass = (oc.status || 'pendente').toLowerCase();
 
-        item.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center;">
+        // Criando a parte do cabeçalho do card
+        const header = document.createElement('div');
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'center';
+        header.innerHTML = `
             <strong>${oc.nome}</strong>
-            <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
-          </div>
-          <p>${oc.descricao}</p>
+            <span class="status-badge status-${statusClass}">${statusText}</span>
         `;
-
+        item.appendChild(header);
+        
+        // Criando a parte da descrição
+        const description = document.createElement('p');
+        description.textContent = oc.descricao;
+        item.appendChild(description);
+        
+        // O código para adicionar imagens, mapa e comentários continua o mesmo
         if (oc.imagens) {
           const imageNames = oc.imagens.split(',').filter(Boolean);
           imageNames.forEach(imageName => {
@@ -197,6 +289,41 @@
         carregarComentarios(oc.id, commentsContainer);
       });
     }
+    
+    function aplicarFiltros() {
+      const statusValue = filterStatus.value;
+      const dataValue = filterData.value;
+
+      let ocorrenciasFiltradas = todasAsOcorrencias;
+
+      if (statusValue) {
+        ocorrenciasFiltradas = ocorrenciasFiltradas.filter(oc => (oc.status || 'pendente') === statusValue);
+      }
+      if (dataValue) {
+        ocorrenciasFiltradas = ocorrenciasFiltradas.filter(oc => oc.data_ocorrencia && oc.data_ocorrencia.startsWith(dataValue));
+      }
+
+      renderOcorrencias(ocorrenciasFiltradas);
+    }
+
+    async function carregarOcorrencias() {
+      try {
+        const res = await fetch('http://localhost:3000/ocorrencias');
+        const ocorrenciasGerais = await res.json();
+
+        todasAsOcorrencias = ocorrenciasGerais.filter(oc => !oc.status || oc.status.toLowerCase() !== 'excluido');
+
+        renderOcorrencias(todasAsOcorrencias);
+      } catch (error) {
+        ocorrenciasList.innerHTML = '<p>Erro ao carregar as ocorrências. Verifique a conexão com o servidor.</p>';
+
+        console.error("Falha ao carregar ocorrências:", error);
+      }
+    }
+
+    filterStatus.addEventListener('change', aplicarFiltros);
+    filterData.addEventListener('change', aplicarFiltros);
+    filterData.addEventListener('blur', aplicarFiltros);
 
     carregarOcorrencias();
   </script>
