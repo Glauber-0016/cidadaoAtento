@@ -58,9 +58,11 @@
       gap: 15px;
       margin-bottom: 20px;
       padding: 15px;
-      background-color: #f9f9f9;
+      background-color: #ffffff;
       border-radius: 8px;
       flex-wrap: wrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid #e0e0e0;
     }
     .filter-group {
       display: flex;
@@ -74,7 +76,7 @@
     .filter-group select,
     .filter-group input {
       padding: 8px;
-      border: 1px solid #ccc;
+      border: 1px solid #f9f9f9;
       border-radius: 4px;
       font-size: 0.9rem;
     }
@@ -199,14 +201,11 @@
       }
 
       ocorrencias.forEach(oc => {
-        // --- JAVASCRIPT CORRIGIDO ---
         const item = document.createElement('div');
         item.className = 'occurrence-card'; // Voltamos a usar a classe correta
         
         const statusText = (oc.status || 'pendente').replace('_', ' ');
         const statusClass = (oc.status || 'pendente').toLowerCase();
-
-        // Criando a parte do cabeçalho do card
         const header = document.createElement('div');
         header.style.display = 'flex';
         header.style.justifyContent = 'space-between';
@@ -217,12 +216,10 @@
         `;
         item.appendChild(header);
         
-        // Criando a parte da descrição
         const description = document.createElement('p');
         description.textContent = oc.descricao;
         item.appendChild(description);
-        
-        // O código para adicionar imagens, mapa e comentários continua o mesmo
+      
         if (oc.imagens) {
           const imageNames = oc.imagens.split(',').filter(Boolean);
           imageNames.forEach(imageName => {
