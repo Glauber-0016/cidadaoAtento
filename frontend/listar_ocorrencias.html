@@ -9,6 +9,29 @@
   <script src="../backend/node_modules/leaflet/dist/leaflet.js"></script>
 
   <style>
+
+    .like-button {
+    cursor: pointer;
+    font-size: 22px;
+    color: #ccc;
+    transition: color 0.3s;
+    margin-left: 10px;
+    }
+
+    .like-button.liked {
+    color: red;
+    }
+
+    .like-container {
+      
+    }
+
+    .status-container{
+      margin-left: auto;
+      position: absolute;
+      right: ;
+    }
+
     .comment-section {
       margin-top: 15px;
       border-top: 1px solid #ccc;
@@ -224,8 +247,11 @@
         header.style.alignItems = 'center';
         header.innerHTML = `
             <strong>${oc.nome}</strong>
+            </div class="status-container">
             <span class="status-badge status-${statusClass}">${statusText}</span>
-        `;
+            <div class="like-container">
+            <span class="like-button" onclick="this.classList.toggle('liked')">&#10084;</span>`;
+
         item.appendChild(header);
         
         const description = document.createElement('p');

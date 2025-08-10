@@ -5,101 +5,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cidadão Atento - Administrar</title>
   <link rel="stylesheet" href="./assets/css/listar.css" />
-
   <link rel="stylesheet" href="../leaflet/node_modules/leaflet/dist/leaflet.css" />
   <script src="../leaflet/node_modules/leaflet/dist/leaflet.js"></script>
 
   <style>
+    /* ======== ESTILO PADRONIZADO ======== */
 
-    .like-button {
-    cursor: pointer;
-    font-size: 22px;
-    color: #ccc;
-    transition: color 0.3s;
-    margin-left: 10px;
-    }
-
-    .like-button.liked {
-    color: red;
+    main.content .card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
     }
 
-    .like-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 8px;
-    }
-
-    .occurrence-map {
-      height: 150px;
-      width: 100%;
-      max-width: 400px;
-      margin-top: 10px;
-      border-radius: 5px;
-    }
-    .occurrence-image {
-      max-width: 100%;
-      height: auto;
-      margin-top: 10px;
-      border-radius: 5px;
-    }
     .occurrence-card {
-      border: 1px solid #ddd;
-      padding: 15px;
-      margin-bottom: 15px;
+      background-color: white;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid #e0e0e0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
+
     .occurrence-card strong {
       color: #333;
     }
+
     .occurrence-card p {
       color: #555;
       margin-top: 5px;
     }
+
+    .occurrence-image {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    .occurrence-map {
+      height: 180px;
+      border-radius: 6px;
+    }
+
     .status-badge {
       padding: 4px 10px;
       border-radius: 12px;
-      font-size: 0.85em;
-      font-weight: bold;
       color: white;
+      font-size: 0.8rem;
+      font-weight: bold;
       text-transform: capitalize;
     }
-    .status-badge.status-pendente { 
-        background-color: #ffc107; color: #333; 
-    }
-    .status-badge.status-em_andamento { 
-        background-color: #17a2b8; 
-    }
-    .status-badge.status-concluido { 
-        background-color: #28a745; 
-    }
+    .status-badge.status-pendente { background-color: #ffc107; color: #333; }
+    .status-badge.status-em_andamento { background-color: #17a2b8; }
+    .status-badge.status-concluido { background-color: #28a745; }
+    .status-badge.status-excluido { background-color: #af4242; }
 
-    .status-badge.status-excluido { 
-        background-color: #af4242; 
-    }
-    
     .status-update-form {
-      margin-top: 15px;
+      margin-top: 10px;
       padding-top: 10px;
       border-top: 1px solid #f0f0f0;
       display: flex;
-      align-items: center;
       gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
     }
+
     .status-update-form select {
       padding: 6px;
       border-radius: 5px;
       border: 1px solid #ccc;
+      font-size: 0.9rem;
     }
+
     .status-update-form button {
       padding: 6px 12px;
       border: none;
-      background-color: #007bff;
+      background-color: #0099AA;
       color: white;
       border-radius: 5px;
       cursor: pointer;
+    }
+
+    .status-update-form button:hover {
+      background-color: #007c8a;
     }
   </style>
 </head>
@@ -125,11 +114,11 @@
     </aside>
 
     <main class="content">
-      <h2>Administrar Ocorrencias</h2>
-      <div class="card-list" id="ocorrenciasList">
-        </div>
+      <h2>Administrar Ocorrências</h2>
+      <div class="card-list" id="ocorrenciasList"></div>
     </main>
   </div>
+
   <script>
     const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
     const ocorrenciasList = document.getElementById('ocorrenciasList');
@@ -143,39 +132,39 @@
       ocorrencias.forEach(oc => {
         const item = document.createElement('div');
         item.className = 'occurrence-card';
+
         const statusText = (oc.status || 'pendente').replace('_', ' ');
 
-        const cardHeaderHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <strong>${oc.nome}</strong>
-          <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
-        </div>
+        // Cabeçalho do card
+        const headerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>${oc.nome}</strong>
+            <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+          </div>
           <p>${oc.descricao}</p>
-        <div class="like-container">
-            <span class="like-button" onclick="this.classList.toggle('liked')">&#10084;</span>
-        </div>`;
+        `;
+        item.innerHTML = headerHTML;
 
-        item.innerHTML = cardHeaderHTML;
-
+        // Imagens
         if (oc.imagens) {
           const imageNames = oc.imagens.split(',').filter(Boolean);
-          if (imageNames.length > 0) {
-            imageNames.forEach(imageName => {
-              const imgElement = document.createElement('img');
-              imgElement.src = `${IMAGES_BASE_URL}${imageName.trim()}`;
-              imgElement.alt = `Imagem da ocorrência ${oc.nome}`;
-              imgElement.className = 'occurrence-image';
-              item.appendChild(imgElement);
-            });
-          }
+          imageNames.forEach(imageName => {
+            const imgElement = document.createElement('img');
+            imgElement.src = `${IMAGES_BASE_URL}${imageName.trim()}`;
+            imgElement.alt = `Imagem da ocorrência ${oc.nome}`;
+            imgElement.className = 'occurrence-image';
+            item.appendChild(imgElement);
+          });
         }
 
+        // Mapa
         if (oc.latitude && oc.longitude) {
           const mapId = `map-${oc.id}`;
           const mapContainer = document.createElement('div');
           mapContainer.id = mapId;
           mapContainer.className = 'occurrence-map';
           item.appendChild(mapContainer);
+
           setTimeout(() => {
             const map = L.map(mapId).setView([oc.latitude, oc.longitude], 14);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
@@ -184,14 +173,14 @@
           }, 0);
         }
 
+        // Formulário de atualização de status
         const formHTML = `
           <form class="status-update-form" data-id="${oc.id}">
-            <input type="hidden" name="id" value="${oc.id}">
             <select name="status">
-                <option value="pendente" ${oc.status === 'pendente' ? 'selected' : ''}>Pendente</option>
-                <option value="em_andamento" ${oc.status === 'em_andamento' ? 'selected' : ''}>Em Andamento</option>
-                <option value="concluido" ${oc.status === 'concluido' ? 'selected' : ''}>Concluído</option>
-                <option value="excluido" ${oc.status === 'excluido' ? 'selected' : ''}>Excluido</option>
+              <option value="pendente" ${oc.status === 'pendente' ? 'selected' : ''}>Pendente</option>
+              <option value="em_andamento" ${oc.status === 'em_andamento' ? 'selected' : ''}>Em Andamento</option>
+              <option value="concluido" ${oc.status === 'concluido' ? 'selected' : ''}>Concluído</option>
+              <option value="excluido" ${oc.status === 'excluido' ? 'selected' : ''}>Excluído</option>
             </select>
             <button type="submit">Atualizar</button>
           </form>
@@ -201,17 +190,15 @@
         ocorrenciasList.appendChild(item);
       });
     }
+
+    // Atualizar status
     ocorrenciasList.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const form = e.target;
-      if (!form.classList.contains('status-update-form')) {
-        return;
-      }
-      
+      if (!form.classList.contains('status-update-form')) return;
+
       const occurrenceId = form.dataset.id; 
       const newStatus = form.querySelector('select[name="status"]').value;
-
       const submitButton = form.querySelector('button');
       submitButton.disabled = true;
 
@@ -232,9 +219,9 @@
       } catch (error) {
         alert(`Falha ao atualizar: ${error.message}`);
         submitButton.disabled = false;
-        submitButton.textContent = 'Atualizar';
       }
     });
+
     carregarOcorrencias();
   </script>
 </body>
