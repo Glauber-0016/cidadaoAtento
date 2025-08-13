@@ -200,6 +200,15 @@
     const filterData = document.getElementById('filter-data');
     let todasAsOcorrencias = []; 
 
+    //pega o id do usuario
+    document.addEventListener('DOMContentLoaded', function() {
+        const usuarioLogado = verificarAutenticacao();
+        if (usuarioLogado) {
+            currentUserId = getUserId();
+        }
+        carregarOcorrencias();
+    });
+
      async function toggleLike(ocorrenciaId, likeButton) {
     
       if (!currentUserId) {

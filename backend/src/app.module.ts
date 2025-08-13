@@ -5,7 +5,6 @@ import { AuthModule } from './auth/auth.module';
 import { OcorrenciasModule } from './ocorrencias/ocorrencias.module';
 import { ComentariosModule } from './comentarios/comentario.module';
 import { LikesModule } from './likes/like.module';
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -24,6 +23,7 @@ import { LikesModule } from './likes/like.module';
     OcorrenciasModule, 
     ComentariosModule,
     LikesModule,
+
   ],
 })
 export class AppModule {}

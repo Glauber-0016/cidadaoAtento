@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Cidadão Atento</title>
+  <link rel="stylesheet" href="./assets/css/listar.css" />
+
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    main.content {
+      padding: 20px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .dashboard-card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .dashboard-card h3 {
+      margin-top: 0;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    #mapaOcorrencias {
+      height: 400px;
+      width: 100%;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Cidadão Atento</h2>
+      <nav>
+        <ul>
+          <li><a href="./pages/main.html">🏠</a></li>
+          <li><a href="./register_occurrence.html">📝</a></li>
+          <li><a href="./listar_ocorrencias.html">🔍</a></li>
+          <li><a href="./minhas_ocorrencias.html">👔</a></li>
+           <li class="active"><a href="./dashboard.html">📊</a></li>
+          <li><a href="#">❓</a></li>
+         
+        </ul>
+      </nav>
+      <footer>
+        <img src="assets/icons/Logobrancasemfundo.png" alt="Logo" />
+        <p>Juntos construímos uma cidade melhor.</p>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <h2>Dashboard de Ocorrências</h2>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <h3>Status das Ocorrências</h3>
+          <canvas id="statusChart"></canvas>
+        </div>
+
+        <div class="dashboard-card">
+          <h3>Total de Ocorrências</h3>
+          <h1 id="totalOcorrencias"></h1>
+        </div>
+        
+        <div class="dashboard-card" style="grid-column: 1 / -1;">
+          <h3>Ocorrências por Data</h3>
+          <canvas id="ocorrenciasPorDataChart"></canvas>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      carregarDadosDashboard();
+    });
+
+    async function carregarDadosDashboard() {
+      try {
+        const response = await fetch('http://localhost:3000/ocorrencias');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const ocorrencias = await response.json();
+
+        const ocorrenciasAtivas = ocorrencias.filter(oc => !oc.status || oc.status.toLowerCase() !== 'excluido');
+
+
+        document.getElementById('totalOcorrencias').textContent = ocorrenciasAtivas.length;
+
+        gerarGraficoStatus(ocorrenciasAtivas);
+        gerarGraficoOcorrenciasPorData(ocorrenciasAtivas);
+
+      } catch (error) {
+        console.error("Falha ao carregar dados para o dashboard:", error);
+        document.querySelector('main.content').innerHTML = '<p>Erro ao carregar os dados do dashboard. Verifique a conexão com o servidor e tente novamente.</p>';
+      }
+    }
+
+    function gerarGraficoStatus(ocorrencias) {
+      const ctx = document.getElementById('statusChart').getContext('2d');
+      const statusCounts = {
+        pendente: 0,
+        em_andamento: 0,
+        concluido: 0,
+        rejeitado: 0
+      };
+
+      ocorrencias.forEach(oc => {
+        const status = oc.status || 'pendente';
+        if (statusCounts.hasOwnProperty(status)) {
+          statusCounts[status]++;
+        }
+      });
+
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Pendente', 'Em Andamento', 'Concluído', 'Rejeitado'],
+          datasets: [{
+            label: 'Status das Ocorrências',
+            data: Object.values(statusCounts),
+            backgroundColor: [
+              '#ffc107',
+              '#17a2b8',
+              '#28a745',
+              '#dc3545'
+            ]
+          }]
+        }
+      });
+    }
+    
+    function gerarGraficoOcorrenciasPorData(ocorrencias) {
+      const ctx = document.getElementById('ocorrenciasPorDataChart').getContext('2d');
+      const dataCounts = {};
+
+      ocorrencias.forEach(oc => {
+          if (oc.data_ocorrencia) {
+              const data = oc.data_ocorrencia.split('T')[0]; 
+              dataCounts[data] = (dataCounts[data] || 0) + 1;
+          }
+      });
+
+      const labels = Object.keys(dataCounts).sort();
+      const data = labels.map(label => dataCounts[label]);
+
+      new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: labels,
+              datasets: [{
+                  label: 'Número de Ocorrências por Dia',
+                  data: data,
+                  borderColor: '#007BFF',
+                  tension: 0.1,
+                  fill: false
+              }]
+          },
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true
+                  }
+              }
+          }
+      });
+    }
+  </script>
+</body>
+</html>

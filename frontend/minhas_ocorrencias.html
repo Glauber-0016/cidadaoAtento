@@ -78,6 +78,7 @@
             <li><a href="./register_occurrence.html">📝</a></li>
             <li><a href="./listar_ocorrencias.html">🔍</a></li>
             <li class="active"><a href="./minhas_ocorrencias.html">👔</a></li>
+             <li><a href="./dashboard.html">📊</a></li>
             <li><a href="#">❓</a></li>
         </ul>
       </nav>
@@ -98,13 +99,13 @@
   </div>
 
 <script src="auth.js"></script> <script>
-    // 1. Defina as constantes e a variável para o ID do usuário
+
     const API_BASE_URL = 'http://localhost:3000';
     const IMAGES_BASE_URL = `${API_BASE_URL}/uploads/`;
     const minhasOcorrenciasList = document.getElementById('minhasOcorrenciasList');
     let currentUserId = null;
-
-    // 2. Verifique o login e pegue o ID do usuário quando a página carregar
+    
+    //pega o ID do usuario
     document.addEventListener('DOMContentLoaded', function() {
         const usuarioLogado = verificarAutenticacao();
 
@@ -116,19 +117,15 @@
         }
     });
 
-    // 3. Função para carregar as ocorrências chamando a NOVA ROTA
     async function carregarMinhasOcorrencias(userId) {
-        if (!userId) return; // Não faz nada se não houver um ID
+        if (!userId) return; 
 
         try {
-            // Chamando a nova rota: /ocorrencias/user/{ID_DO_USUARIO}
             const res = await fetch(`${API_BASE_URL}/ocorrencias/user/${userId}`);
             if (!res.ok) {
                 throw new Error('Falha ao carregar ocorrências.');
             }
             const minhasOcorrencias = await res.json();
-
-            // Como o backend já filtrou, não precisamos mais do '.filter()' aqui
             renderizarOcorrencias(minhasOcorrencias);
 
         } catch (error) {
@@ -137,7 +134,6 @@
         }
     }
 
-    // 4. Função para renderizar os cards na tela
     function renderizarOcorrencias(ocorrencias) {
         minhasOcorrenciasList.innerHTML = '';
 
@@ -150,8 +146,6 @@
             const item = document.createElement('div');
             item.className = 'occurrence-card';
             const statusText = (oc.status || 'pendente').replace('_', ' ');
-
-            // Monta o card (seu código de renderização original está ótimo)
             item.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <strong>${oc.nome}</strong>
