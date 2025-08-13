@@ -1,5 +1,5 @@
-
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Comentario } from '../comentarios/comentario.entity';
 
 @Entity()
 export class Ocorrencias {
@@ -26,6 +26,10 @@ export class Ocorrencias {
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)', name: 'data_ocorrencia' })
   data_ocorrencia: Date;
+
+  @OneToMany(() => Comentario, comentario => comentario.ocorrencia) 
+  comentarios: Comentario[];
+
 }
 
 

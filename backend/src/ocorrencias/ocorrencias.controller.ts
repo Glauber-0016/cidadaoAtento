@@ -1,4 +1,3 @@
-
 import { Controller, Post, Body, Get, UseInterceptors, UploadedFiles,Param,Patch,BadRequestException } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { OcorrenciasService } from './ocorrencias.service';

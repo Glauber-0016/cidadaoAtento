@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from './auth/auth.module';
 import { OcorrenciasModule } from './ocorrencias/ocorrencias.module';
+import { ComentariosModule } from './comentarios/comentario.module';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { OcorrenciasModule } from './ocorrencias/ocorrencias.module';
     AuthModule,
 
     OcorrenciasModule, 
-
+    ComentariosModule,
     
   ],
 })

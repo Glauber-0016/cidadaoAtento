@@ -29,7 +29,7 @@
     .status-container{
       margin-left: auto;
       position: absolute;
-      right: ;
+      right: 0;
     }
 
     .comment-section {
@@ -203,6 +203,8 @@
   </script>
 
   <script>
+    const API_BASE_URL = 'http://localhost:3000';
+
     const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
     const ocorrenciasList = document.getElementById('ocorrenciasList');
     
@@ -213,7 +215,7 @@
 
     async function carregarComentarios(ocorrenciaId, commentsContainer) {
       try {
-        const res = await fetch(`http://localhost:3000/comentarios/${ocorrenciaId}`);
+        const res = await fetch(`${API_BASE_URL}/comentarios/${ocorrenciaId}`);
         const comentarios = await res.json();
         commentsContainer.innerHTML = '';
         comentarios.forEach(c => {
@@ -285,7 +287,6 @@
 
         const commentSection = document.createElement('div');
         commentSection.className = 'comment-section';
-
         const commentsContainer = document.createElement('div');
         commentsContainer.id = `comments-${oc.id}`;
         commentSection.appendChild(commentsContainer);
@@ -299,16 +300,17 @@
         `;
         commentForm.addEventListener('submit', async (e) => {
           e.preventDefault();
-          const nome = commentForm.nome.value;
-          const texto = commentForm.texto.value;
-          const body = { nome, texto, ocorrenciaId: oc.id };
+          const body = { 
+            nome: commentForm.nome.value, 
+            texto: commentForm.texto.value, 
+            ocorrenciaId: oc.id 
+          };
 
-          const res = await fetch('http://localhost:3000/comentarios', {
+          const res = await fetch(`${API_BASE_URL}/comentarios`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
           });
-
           if (res.ok) {
             commentForm.reset();
             carregarComentarios(oc.id, commentsContainer);
@@ -316,10 +318,9 @@
             alert('Erro ao enviar comentário.');
           }
         });
-
         commentSection.appendChild(commentForm);
         item.appendChild(commentSection);
-
+        
         ocorrenciasList.appendChild(item);
         carregarComentarios(oc.id, commentsContainer);
       });
