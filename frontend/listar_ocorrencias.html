@@ -29,7 +29,7 @@
     .status-container{
       margin-left: auto;
       position: absolute;
-      /*right: ;*/
+      right: 0;
     }
 
     .comment-section {
@@ -193,77 +193,127 @@
 
   <script src="auth.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const usuario = verificarAutenticacao();
-      
-      if (usuario) {
-        document.getElementById('teste').textContent = getUserId();
-      }
-    });
-  </script>
-
-  <script>
+    const API_BASE_URL = 'http://localhost:3000';
     const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
     const ocorrenciasList = document.getElementById('ocorrenciasList');
     
     const filterStatus = document.getElementById('filter-status');
     const filterData = document.getElementById('filter-data');
-
     let todasAsOcorrencias = []; 
 
-    async function carregarComentarios(ocorrenciaId, commentsContainer) {
-      try {
-        const res = await fetch(`http://localhost:3000/comentarios/${ocorrenciaId}`);
-        const comentarios = await res.json();
-        commentsContainer.innerHTML = '';
-        comentarios.forEach(c => {
-          const commentEl = document.createElement('div');
-          commentEl.className = 'comment';
-          commentEl.innerHTML = `<strong>${c.nome}</strong><p>${c.texto}</p>`;
-          commentsContainer.appendChild(commentEl);
-        });
-      } catch (err) {
-        commentsContainer.innerHTML = '<p>Erro ao carregar comentários.</p>';
-      }
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const usuarioLogado = verificarAutenticacao();
 
-    function renderOcorrencias(ocorrencias) {
-      ocorrenciasList.innerHTML = ''; 
-      
-      if (ocorrencias.length === 0) {
-        ocorrenciasList.innerHTML = '<p style="text-align: center;">Nenhuma ocorrência encontrada com os filtros selecionados.</p>';
-        return;
+        if (usuarioLogado) {
+            currentUserId = getUserId();
+            document.getElementById('teste').textContent = `${currentUserId}`;
+        }
+        carregarOcorrencias();
+    });
+
+     async function toggleLike(ocorrenciaId, likeButton) {
+    
+      if (!currentUserId) {
+          alert('Você precisa estar logado para curtir.');
+          return; 
       }
+      try {
+          const res = await fetch(`${API_BASE_URL}/ocorrencias/${ocorrenciaId}/likes`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: currentUserId }) 
+          });
+
+          if (!res.ok) throw new Error('Falha ao processar o like.');
+          const likeCountSpan = likeButton.nextElementSibling;
+          let currentCount = parseInt(likeCountSpan.textContent);
+
+          if (likeButton.classList.contains('liked')) {
+              likeButton.classList.remove('liked');
+              likeCountSpan.textContent = currentCount - 1;
+          } else {
+              likeButton.classList.add('liked');
+              likeCountSpan.textContent = currentCount + 1;
+          }
+
+        } catch (error) {
+          console.error('Erro ao curtir:', error);
+          alert('Não foi possível registrar sua curtida.');
+        }
+      }
+      
+
+
+      async function carregarComentarios(ocorrenciaId, commentsContainer) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/comentarios/${ocorrenciaId}`);
+          const comentarios = await res.json();
+          commentsContainer.innerHTML = '';
+          comentarios.forEach(c => {
+            const commentEl = document.createElement('div');
+            commentEl.className = 'comment';
+            commentEl.innerHTML = `<strong>${c.nome}</strong><p>${c.texto}</p>`;
+            commentsContainer.appendChild(commentEl);
+          });
+        } catch (err) {
+          commentsContainer.innerHTML = '<p>Erro ao carregar comentários.</p>';
+        }
+      }
+
+      function renderOcorrencias(ocorrencias) {
+        ocorrenciasList.innerHTML = '';
+        if (ocorrencias.length === 0) {
+          ocorrenciasList.innerHTML = '<p style="text-align: center;">Nenhuma ocorrência encontrada.</p>';
+          return;
+        }
 
       ocorrencias.forEach(oc => {
         const item = document.createElement('div');
-        item.className = 'occurrence-card'; // Voltamos a usar a classe correta
-        
+        item.className = 'occurrence-card';
+
         const statusText = (oc.status || 'pendente').replace('_', ' ');
         const statusClass = (oc.status || 'pendente').toLowerCase();
+        
+
+        
         const header = document.createElement('div');
+        header.className = 'occurrence-header';
         header.style.display = 'flex';
-        header.style.justifyContent = 'space-between';
-        header.style.alignItems = 'center';
-        header.innerHTML = `
-            <strong>${oc.nome}</strong>
-            </div class="status-container">
+        header.style.justifyContent = 'space-between'; 
+        header.style.alignItems = 'center'; 
+        header.style.width = '100%'; 
+
+        const titleContainer = document.createElement('div');
+        titleContainer.innerHTML = `<strong>${oc.nome}</strong>`;
+
+        const metaContainer = document.createElement('div');
+        metaContainer.style.display = 'flex';
+        metaContainer.style.alignItems = 'center';
+        metaContainer.style.gap = '15px'; 
+
+        const userHasLiked = window.currentUserId && oc.likes.some(like => like.userId === window.currentUserId);
+        const likedClass = userHasLiked ? 'liked' : '';
+
+        metaContainer.innerHTML = `
             <span class="status-badge status-${statusClass}">${statusText}</span>
-            <div class="like-container">
-            <span class="like-button" onclick="this.classList.toggle('liked')">&#10084;</span>`;
+            <div class="like-container" style="display: flex; align-items: center;">
+                <span class="like-button ${likedClass}" onclick="toggleLike(${oc.id}, this)">&#10084;</span>
+                <span class="like-count" style="margin-left: 5px;">${oc.likes.length}</span>
+            </div>
+        `;
+        header.appendChild(titleContainer);
+        header.appendChild(metaContainer);
 
         item.appendChild(header);
-        
+
         const description = document.createElement('p');
         description.textContent = oc.descricao;
         item.appendChild(description);
-      
+
         if (oc.imagens) {
-          const imageNames = oc.imagens.split(',').filter(Boolean);
-          imageNames.forEach(imageName => {
+          oc.imagens.split(',').filter(Boolean).forEach(imageName => {
             const img = document.createElement('img');
             img.src = `${IMAGES_BASE_URL}${imageName.trim()}`;
-            img.alt = `Imagem da ocorrência ${oc.nome}`;
             img.className = 'occurrence-image';
             item.appendChild(img);
           });
@@ -277,7 +327,7 @@
           item.appendChild(mapContainer);
           setTimeout(() => {
             const map = L.map(mapId).setView([oc.latitude, oc.longitude], 14);
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             L.marker([oc.latitude, oc.longitude]).addTo(map);
             map.invalidateSize();
           }, 0);
@@ -285,7 +335,6 @@
 
         const commentSection = document.createElement('div');
         commentSection.className = 'comment-section';
-
         const commentsContainer = document.createElement('div');
         commentsContainer.id = `comments-${oc.id}`;
         commentSection.appendChild(commentsContainer);
@@ -299,16 +348,17 @@
         `;
         commentForm.addEventListener('submit', async (e) => {
           e.preventDefault();
-          const nome = commentForm.nome.value;
-          const texto = commentForm.texto.value;
-          const body = { nome, texto, ocorrenciaId: oc.id };
+          const body = { 
+            nome: commentForm.nome.value, 
+            texto: commentForm.texto.value, 
+            ocorrenciaId: oc.id 
+          };
 
-          const res = await fetch('http://localhost:3000/comentarios', {
+          const res = await fetch(`${API_BASE_URL}/comentarios`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
           });
-
           if (res.ok) {
             commentForm.reset();
             carregarComentarios(oc.id, commentsContainer);
@@ -316,10 +366,9 @@
             alert('Erro ao enviar comentário.');
           }
         });
-
         commentSection.appendChild(commentForm);
         item.appendChild(commentSection);
-
+        
         ocorrenciasList.appendChild(item);
         carregarComentarios(oc.id, commentsContainer);
       });

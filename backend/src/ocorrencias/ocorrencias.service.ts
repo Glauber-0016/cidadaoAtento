@@ -1,7 +1,7 @@
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { Ocorrencias } from './ocorrencias.entity';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class OcorrenciasService {
 async updateStatus(id: string, newStatus: string): Promise<Ocorrencias> {
     const ocorrenciaToUpdate = await this.repo.preload({
       id: parseInt(id),
-      status: newStatus, // <-- Garanta que aqui também seja 'status' (ou o nome real da coluna no seu BD/Entidade)
+      status: newStatus,
     });
 
     if (!ocorrenciaToUpdate) {
@@ -29,7 +29,14 @@ async updateStatus(id: string, newStatus: string): Promise<Ocorrencias> {
   }
 
   findAll() {
-    return this.repo.find();
+    return this.repo.find({ relations: ['likes'] });
+  }
+
+  findByUserId(userId: number) {
+    return this.repo.find({
+      where: { userId },
+      order: { data_ocorrencia: 'DESC' } 
+    });
   }
 
   async findByStatus(status: string) {

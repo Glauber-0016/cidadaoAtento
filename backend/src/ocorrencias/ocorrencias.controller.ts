@@ -1,4 +1,3 @@
-
 import { Controller, Post, Body, Get, UseInterceptors, UploadedFiles,Param,Patch,BadRequestException } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { OcorrenciasService } from './ocorrencias.service';
@@ -46,5 +45,10 @@ export class OcorrenciasController {
   @Get('status/:status')
   findByStatus(@Param('status') status: string) {
     return this.service.findByStatus(status);
+  }
+
+  @Get('user/:userId')
+  findOccurrencesByUser(@Param('userId') userId: string) {
+    return this.service.findByUserId(parseInt(userId, 10));
   }
 }
