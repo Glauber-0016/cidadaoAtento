@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cidadão Atento - Administrar</title>
   <link rel="stylesheet" href="./assets/css/listar.css" />
-  <link rel="stylesheet" href="../leaflet/node_modules/leaflet/dist/leaflet.css" />
-  <script src="../leaflet/node_modules/leaflet/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="../backend/node_modules/leaflet/dist/leaflet.css" />
+  <script src="../backend/node_modules/leaflet/dist/leaflet.js"></script>
 
   <style>
-    /* ======== ESTILO PADRONIZADO ======== */
-
     main.content .card-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -168,7 +166,7 @@
 
           setTimeout(() => {
             const map = L.map(mapId).setView([oc.latitude, oc.longitude], 14);
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             L.marker([oc.latitude, oc.longitude]).addTo(map);
             map.invalidateSize();
           }, 0);

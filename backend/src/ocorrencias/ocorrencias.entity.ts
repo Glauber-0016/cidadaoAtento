@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 
 import { Comentario } from '../comentarios/comentario.entity';
 import { Like } from '../likes/like.entity';
+import { User } from '../auth/user.entity';
 
 @Entity()
 export class Ocorrencias {
@@ -10,6 +11,15 @@ export class Ocorrencias {
 
   @Column({ nullable: true }) 
   userId: number;
+
+  @ManyToOne(() => User, {
+    eager: false,
+    nullable: true,
+    createForeignKeyConstraints: false,
+  })
+  
+  @JoinColumn({ name: 'userId' })
+  usuario?: User;
 
   @Column()
   nome: string;
