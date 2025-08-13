@@ -64,8 +64,17 @@
     </pages/main>
   </div>
 
-  <script>
-    //Configuração do mapa
+<script src="auth.js"></script> <script>
+  let currentUserId = null;
+  document.addEventListener('DOMContentLoaded', function() {
+    const usuarioLogado = verificarAutenticacao();
+      if (usuarioLogado) {
+        currentUserId = getUserId();
+    } else {
+         document.querySelector('#occurrenceForm button[type="submit"]').disabled = true;
+      }
+    });
+
     var map = L.map('map').setView([-11.302755, -41.85585], 14);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -77,21 +86,17 @@
 
     function onMapClick(e) {
       if (marker) {
-          marker.setLatLng(e.latlng); // Move o marcador existente
+          marker.setLatLng(e.latlng); 
       } else {
-          marker = L.marker(e.latlng).addTo(map); // Cria novo marcador
+          marker = L.marker(e.latlng).addTo(map); 
       }
 
       document.getElementById('latitude').value = e.latlng.lat;
       document.getElementById('longitude').value = e.latlng.lng;
     }
     map.on('click', onMapClick);
+    var selectedImages = []; 
 
-
-    //Configuração do upload de imagens
-    var selectedImages = []; // Armazena as imagens
-
-    // Manipulador de seleção de imagens
     document.getElementById('images').addEventListener('change', function(e) {
       const files = e.target.files;
       selectedImages = [];
@@ -101,7 +106,7 @@
       for (let i = 0; i < maxFiles; i++) {
         const file = files[i];
         
-        if (!file.type.match('image.*')) { // Verifica se é uma imagem
+        if (!file.type.match('image.*')) { 
           continue;
         }
 
@@ -115,13 +120,10 @@
       }
     });
 
-    // Função para remover imagem
     function removeImage(index) {
       selectedImages.splice(index, 1);
     }
 
-    
-    //Interação com o Banco de Dados
     document.getElementById('occurrenceForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('name').value;
@@ -135,7 +137,7 @@
         formData.append('descricao', description);
         formData.append('latitude', latitude);
         formData.append('longitude', longitude);
-        
+        formData.append('userId', currentUserId);
         selectedImages.forEach((image, index) => {
           formData.append('imagens', image);
         });

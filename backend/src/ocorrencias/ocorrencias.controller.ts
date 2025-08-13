@@ -41,5 +41,10 @@ export class OcorrenciasController {
   findAll() {
     return this.service.findAll();
   }
+
+  @Get('user/:userId')
+  findOccurrencesByUser(@Param('userId') userId: string) {
+    return this.service.findByUserId(parseInt(userId, 10));
+  }
 }
 

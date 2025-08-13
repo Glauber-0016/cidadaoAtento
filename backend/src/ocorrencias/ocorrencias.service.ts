@@ -31,4 +31,11 @@ async updateStatus(id: string, newStatus: string): Promise<Ocorrencias> {
   findAll() {
     return this.repo.find({ relations: ['likes'] });
   }
+
+  findByUserId(userId: number) {
+    return this.repo.find({
+      where: { userId },
+      order: { data_ocorrencia: 'DESC' } 
+    });
+  }
 }

@@ -8,6 +8,9 @@ export class Ocorrencias {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true }) 
+  userId: number;
+
   @Column()
   nome: string;
 
@@ -32,7 +35,7 @@ export class Ocorrencias {
   @OneToMany(() => Comentario, comentario => comentario.ocorrencia) 
   comentarios: Comentario[];
 
-  @OneToMany(() => Like, like => like.ocorrencia) // <-- Adicione esta propriedade
+  @OneToMany(() => Like, like => like.ocorrencia) 
   likes: Like[];
 
 }

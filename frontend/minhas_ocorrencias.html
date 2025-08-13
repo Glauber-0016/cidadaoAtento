@@ -97,64 +97,96 @@
     </main>
   </div>
 
-  <script>
-    const USER_ID = 1; // Substitua pelo id do usuário logado
-    const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
+<script src="auth.js"></script> <script>
+    // 1. Defina as constantes e a variável para o ID do usuário
+    const API_BASE_URL = 'http://localhost:3000';
+    const IMAGES_BASE_URL = `${API_BASE_URL}/uploads/`;
     const minhasOcorrenciasList = document.getElementById('minhasOcorrenciasList');
+    let currentUserId = null;
 
-    async function carregarMinhasOcorrencias() {
-      const res = await fetch('http://localhost:3000/ocorrencias');
-      const todasOcorrencias = await res.json();
+    // 2. Verifique o login e pegue o ID do usuário quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        const usuarioLogado = verificarAutenticacao();
 
-      const minhasOcorrencias = todasOcorrencias.filter(oc =>
-        oc.idUsuario === USER_ID && (!oc.status || oc.status.toLowerCase() !== 'excluido')
-      );
-
-      minhasOcorrenciasList.innerHTML = '';
-
-      minhasOcorrencias.forEach(oc => {
-        const item = document.createElement('div');
-        item.className = 'occurrence-card';
-        const statusText = (oc.status || 'pendente').replace('_', ' ');
-
-        item.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <strong>${oc.nome}</strong>
-            <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
-          </div>
-          <p>${oc.descricao}</p>
-        `;
-
-        if (oc.imagens) {
-          const imagens = oc.imagens.split(',').filter(Boolean);
-          imagens.forEach(img => {
-            const el = document.createElement('img');
-            el.src = IMAGES_BASE_URL + img.trim();
-            el.className = 'occurrence-image';
-            item.appendChild(el);
-          });
+        if (usuarioLogado) {
+            currentUserId = getUserId();
+            carregarMinhasOcorrencias(currentUserId);
+        } else {
+            minhasOcorrenciasList.innerHTML = '<p>Você precisa estar logado para ver suas ocorrências. Faça o login e volte para esta página.</p>';
         }
+    });
 
-        if (oc.latitude && oc.longitude) {
-          const mapId = `map-${oc.id}`;
-          const mapContainer = document.createElement('div');
-          mapContainer.id = mapId;
-          mapContainer.className = 'occurrence-map';
-          item.appendChild(mapContainer);
+    // 3. Função para carregar as ocorrências chamando a NOVA ROTA
+    async function carregarMinhasOcorrencias(userId) {
+        if (!userId) return; // Não faz nada se não houver um ID
 
-          setTimeout(() => {
-            const map = L.map(mapId).setView([oc.latitude, oc.longitude], 14);
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-            L.marker([oc.latitude, oc.longitude]).addTo(map);
-            map.invalidateSize();
-          }, 0);
+        try {
+            // Chamando a nova rota: /ocorrencias/user/{ID_DO_USUARIO}
+            const res = await fetch(`${API_BASE_URL}/ocorrencias/user/${userId}`);
+            if (!res.ok) {
+                throw new Error('Falha ao carregar ocorrências.');
+            }
+            const minhasOcorrencias = await res.json();
+
+            // Como o backend já filtrou, não precisamos mais do '.filter()' aqui
+            renderizarOcorrencias(minhasOcorrencias);
+
+        } catch (error) {
+            console.error(error);
+            minhasOcorrenciasList.innerHTML = '<p>Ocorreu um erro ao buscar suas ocorrências.</p>';
         }
-
-        minhasOcorrenciasList.appendChild(item);
-      });
     }
 
-    carregarMinhasOcorrencias();
-  </script>
+    // 4. Função para renderizar os cards na tela
+    function renderizarOcorrencias(ocorrencias) {
+        minhasOcorrenciasList.innerHTML = '';
+
+        if (ocorrencias.length === 0) {
+            minhasOcorrenciasList.innerHTML = '<p>Você ainda não registrou nenhuma ocorrência.</p>';
+            return;
+        }
+
+        ocorrencias.forEach(oc => {
+            const item = document.createElement('div');
+            item.className = 'occurrence-card';
+            const statusText = (oc.status || 'pendente').replace('_', ' ');
+
+            // Monta o card (seu código de renderização original está ótimo)
+            item.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong>${oc.nome}</strong>
+                    <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+                </div>
+                <p>${oc.descricao}</p>
+            `;
+
+            if (oc.imagens) {
+                oc.imagens.split(',').filter(Boolean).forEach(imgName => {
+                    const img = document.createElement('img');
+                    img.src = IMAGES_BASE_URL + imgName.trim();
+                    img.className = 'occurrence-image';
+                    item.appendChild(img);
+                });
+            }
+
+            if (oc.latitude && oc.longitude) {
+                const mapId = `map-${oc.id}`;
+                const mapContainer = document.createElement('div');
+                mapContainer.id = mapId;
+                mapContainer.className = 'occurrence-map';
+                item.appendChild(mapContainer);
+
+                setTimeout(() => {
+                    const map = L.map(mapId).setView([oc.latitude, oc.longitude], 14);
+                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                    L.marker([oc.latitude, oc.longitude]).addTo(map);
+                    map.invalidateSize();
+                }, 0);
+            }
+
+            minhasOcorrenciasList.appendChild(item);
+        });
+    }
+</script>
 </body>
 </html>
