@@ -1,5 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+
 import { Comentario } from '../comentarios/comentario.entity';
+import { Like } from '../likes/like.entity';
 
 @Entity()
 export class Ocorrencias {
@@ -29,6 +31,9 @@ export class Ocorrencias {
 
   @OneToMany(() => Comentario, comentario => comentario.ocorrencia) 
   comentarios: Comentario[];
+
+  @OneToMany(() => Like, like => like.ocorrencia) // <-- Adicione esta propriedade
+  likes: Like[];
 
 }
 
