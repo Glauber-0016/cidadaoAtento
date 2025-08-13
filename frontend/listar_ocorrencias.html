@@ -169,7 +169,6 @@
 
     <main class="content">
       <h2>Ocorrências</h2>
-      <h2 id="teste">Teste</h2>
       
       <div class="filters">
         <div class="filter-group">
@@ -200,16 +199,6 @@
     const filterStatus = document.getElementById('filter-status');
     const filterData = document.getElementById('filter-data');
     let todasAsOcorrencias = []; 
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const usuarioLogado = verificarAutenticacao();
-
-        if (usuarioLogado) {
-            currentUserId = getUserId();
-            document.getElementById('teste').textContent = `${currentUserId}`;
-        }
-        carregarOcorrencias();
-    });
 
      async function toggleLike(ocorrenciaId, likeButton) {
     
