@@ -5,8 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cidadão Atento</title>
     <link rel="stylesheet" href="../assets/css/main.css">
-    <script src="auth.js"></script>
-</head>
+    <script src="../auth.js"></script>
+
+    <link rel="stylesheet" href="../../backend/node_modules/leaflet/dist/leaflet.css" />
+    <script src="../../backend/node_modules/leaflet/dist/leaflet.js"></script>
+
+    <link rel="stylesheet" href="../../backend/node_modules/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="../../backend/node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <script src="../../backend/node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
+    <style>
+        .div-mapa {
+            height: 550px;
+            width: 1000px;
+            border-radius: 6px;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .leaflet-popup-content {
+            max-width: 250px;
+        }
+
+        .popup-ocorrencia h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .popup-ocorrencia p {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .popup-ocorrencia small {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .popup-imagens {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .popup-imagem {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+    </style>
+    </head>
 
 <body>
 
@@ -50,12 +102,11 @@
             <p>Interação simples, acessível e responsável para todos os cidadãos.</p>
         </div>
     </section>
-        </section>
 
+    <section>
+        <div class="div-mapa" id="mapa-principal"></div>
     </section>
-        <div class="div-mapa"></div>
-    <footer>
-
+        
     <footer>
         <div class="footer-logo">
             <img src="../assets/icons/Logobrancasemfundo.png" alt="Logo">
@@ -76,6 +127,58 @@
             <p>suporte@cidadaoatento.com<br>(00) 00000-0000</p>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const map = L.map('mapa-principal').setView([-23.5505, -46.6333], 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            async function carregarOcorrenciasVisiveis() {
+                try {
+                    const response = await fetch('http://localhost:3000/ocorrencias');
+                    const ocorrencias = await response.json();
+
+                    const statusAExcluir = ['concluido', 'excluido'];
+                    const ocorrenciasVisiveis = ocorrencias.filter(oc => oc.status && !statusAExcluir.includes(oc.status.toLowerCase()));
+                    
+                    const markers = L.markerClusterGroup();
+
+                    ocorrenciasVisiveis.forEach(oc => {
+                        if (oc.latitude && oc.longitude) {
+                            const marker = L.marker([oc.latitude, oc.longitude]).addTo(map);
+                            
+                            markers.addLayer(marker);
+
+                            marker.bindPopup(`
+                                <div class="popup-ocorrencia">
+                                    <h3>${oc.nome}</h3>
+                                    <p>${oc.descricao}</p>
+                                    <small>Registrada em: ${new Date(oc.data_ocorrencia).toLocaleDateString()}</small>
+                            `);
+                        }
+                    });
+                    map.addLayer(markers);
+                    
+                    if (ocorrenciasVisiveis.length > 0) {
+                        const group = new L.featureGroup(ocorrenciasVisiveis.map(oc => 
+                            L.marker([oc.latitude, oc.longitude])
+                        ));
+                        map.fitBounds(group.getBounds().pad(0.1));
+                    }
+                    
+                } catch (error) {
+                    console.error('Erro ao carregar ocorrências:', error);
+                    alert('Não foi possível carregar as ocorrências. Tente novamente.');
+                }
+            }
+
+            map.whenReady(carregarOcorrenciasVisiveis);
+        });
+    </script>
 
 </body>
 </html>

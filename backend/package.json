@@ -13,6 +13,7 @@
     "@nestjs/typeorm": "^10.0.0",
     "bcrypt": "^5.0.1",
     "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3",
     "multer": "^2.0.1",
     "mysql2": "^3.0.0",
     "reflect-metadata": "^0.1.13",

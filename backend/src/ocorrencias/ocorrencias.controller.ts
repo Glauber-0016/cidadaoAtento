@@ -42,5 +42,9 @@ export class OcorrenciasController {
   findAll() {
     return this.service.findAll();
   }
-}
 
+  @Get('status/:status')
+  findByStatus(@Param('status') status: string) {
+    return this.service.findByStatus(status);
+  }
+}
