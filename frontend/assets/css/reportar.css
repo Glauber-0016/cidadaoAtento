@@ -1,4 +1,3 @@
-
 * {
   margin: 0;
   padding: 0;
@@ -157,4 +156,110 @@ body {
 
 .botoes .enviar:hover {
   background-color: #007e8a;
+}
+
+.content {
+  margin-left: 200px;
+  padding: 20px;
+}
+
+.sidebar {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background-color: #022534;
+  color: white;
+}
+
+main.content {
+  margin-left: 200px;
+  padding: 20px;
+  width: calc(100% - 200px);
+  min-height: 100vh;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Formulário em tela cheia, mas com limite de largura */
+.formulario {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.formulario input[type="text"],
+.formulario textarea,
+.formulario input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.botoes button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.botoes .voltar {
+  background-color: #ccc;
+  color: #333;
+}
+
+.botoes .enviar {
+  background-color: #0099AA;
+  color: white;
+}
+
+.botoes button:hover {
+  opacity: 0.9;
+}
+
+#map {
+  width: 100%;
+  height: 300px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.map-legend {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #022534;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
 }

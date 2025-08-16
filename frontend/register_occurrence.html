@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reportar Incidente</title>
 
   <link rel="stylesheet" href="../backend/node_modules/leaflet/dist/leaflet.css" />
@@ -15,64 +15,69 @@
       width: 550px;
     }
   </style>
-  
+
   <link rel="stylesheet" href="./assets/css/reportar.css" />
 </head>
 
 <body>
   <div class="container">
     <aside class="sidebar">
-  <h2>Cidadão Atento</h2>
-  <nav>
-    <ul>
-      <li><a href="./pages/main.html">🏠</a></li>
-      <li class="active"><a href="./register_occurrence.html">📝</a></li>
-      <li><a href="./listar_ocorrencias.html">🔍</a></li>
-      <li><a href="./minhas_ocorrencias.html">👔</a></li>
-       <li><a href="./dashboard.html">📊</a></li>
-      <li><a href="#">❓</a></li>
-    </ul>
-  </nav>
-  <footer>
-    <img src="assets/icons/Logobrancasemfundo.png" alt="Logo" />
-    <p>Juntos construímos uma cidade melhor.</p>
-    <div class="links">
-      <p><strong>Links úteis</strong><br>Registrar ocorrência<br>Minhas ocorrências<br>Termos de Uso</p>
-      <p><strong>Contato</strong><br>suporte@cidadaoatento.com<br>(00)00000-0000</p>
-    </div>
-  </footer>
-</aside>
+      <h2>Cidadão Atento</h2>
+      <nav>
+        <ul>
+          <li><a href="./pages/main.html">🏠</a></li>
+          <li class="active"><a href="./register_occurrence.html">📝</a></li>
+          <li><a href="./listar_ocorrencias.html">🔍</a></li>
+          <li><a href="./minhas_ocorrencias.html">👔</a></li>
+          <li><a href="./dashboard.html">📊</a></li>
+          <li><a href="#">❓</a></li>
+        </ul>
+      </nav>
+      <footer>
+        <img src="assets/icons/Logobrancasemfundo.png" alt="Logo" />
+        <p>Juntos construímos uma cidade melhor.</p>
+        <div class="links">
+          <p><strong>Links úteis</strong><br>Registrar ocorrência<br>Minhas ocorrências<br>Termos de Uso</p>
+          <p><strong>Contato</strong><br>suporte@cidadaoatento.com<br>(00)00000-0000</p>
+        </div>
+      </footer>
+    </aside>
     <main class="content">
       <section class="formulario">
         <h2>Reporte um incidente</h2>
-          <form id="occurrenceForm">
+        <form id="occurrenceForm">
           <input type="text" id="name" placeholder="Nome" required /><br />
           <textarea id="description" placeholder="Descrição" required></textarea><br />
 
           <!-- Inserção de imagens no forms -->
           <input type="file" id="images" name="Imagens" multiple accept="image/*">
 
-          <div id="map"></div>
+          <div class="map-wrapper">
+            <div class="map-legend">Clique no mapa para selecionar a localização do incidente</div>
+            <div id="map"></div>
+          </div>
+
           <input type="hidden" id="latitude" name="latitude">
           <input type="hidden" id="longitude" name="longitude">
- 
+
           <div class="botoes">
             <button type="button" class="voltar" onclick="location.href='pages/main.html'">Voltar</button>
             <button type="submit" class="enviar">Enviar</button>
           </div>
         </form>
       </section>
-    </pages/main>
+      </pages/main>
   </div>
 
-<script src="auth.js"></script> <script>
-  let currentUserId = null;
-  document.addEventListener('DOMContentLoaded', function() {
-    const usuarioLogado = verificarAutenticacao();
+  <script src="auth.js"></script>
+  <script>
+    let currentUserId = null;
+    document.addEventListener('DOMContentLoaded', function () {
+      const usuarioLogado = verificarAutenticacao();
       if (usuarioLogado) {
         currentUserId = getUserId();
-    } else {
-         document.querySelector('#occurrenceForm button[type="submit"]').disabled = true;
+      } else {
+        document.querySelector('#occurrenceForm button[type="submit"]').disabled = true;
       }
     });
 
@@ -87,27 +92,27 @@
 
     function onMapClick(e) {
       if (marker) {
-          marker.setLatLng(e.latlng); 
+        marker.setLatLng(e.latlng);
       } else {
-          marker = L.marker(e.latlng).addTo(map); 
+        marker = L.marker(e.latlng).addTo(map);
       }
 
       document.getElementById('latitude').value = e.latlng.lat;
       document.getElementById('longitude').value = e.latlng.lng;
     }
     map.on('click', onMapClick);
-    var selectedImages = []; 
+    var selectedImages = [];
 
-    document.getElementById('images').addEventListener('change', function(e) {
+    document.getElementById('images').addEventListener('change', function (e) {
       const files = e.target.files;
       selectedImages = [];
-      
+
       const maxFiles = Math.min(files.length, 5);
-      
+
       for (let i = 0; i < maxFiles; i++) {
         const file = files[i];
-        
-        if (!file.type.match('image.*')) { 
+
+        if (!file.type.match('image.*')) {
           continue;
         }
 
@@ -115,9 +120,9 @@
           alert(`A imagem ${file.name} excede o tamanho máximo de 5MB`);
           continue;
         }
-        
+
         selectedImages.push(file);
-        
+
       }
     });
 
@@ -149,7 +154,7 @@
         });
 
         if (!res.ok) {
-            throw new Error('Erro ao registrar ocorrência');
+          throw new Error('Erro ao registrar ocorrência');
         }
 
         const data = await res.json();
@@ -171,4 +176,5 @@
 
   </script>
 </body>
+
 </html>

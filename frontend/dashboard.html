@@ -1,41 +1,185 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - Cidadão Atento</title>
   <link rel="stylesheet" href="./assets/css/listar.css" />
-
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     main.content {
       padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
     }
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+    main.content h2 {
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      color: #022534;
+    }
+
+    .dashboard-metrics {
+      display: flex;
       gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
+
+    .metric-card {
+      background-color: #fff;
+      flex: 1;
+      min-width: 150px;
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    .metric-icon {
+      font-size: 36px;
+      margin-right: 15px;
+    }
+
+    .metric-info h3 {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .metric-info p {
+      margin: 5px 0 0;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #022534;
+    }
+
+    .dashboard-alerts {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .alert {
+      padding: 12px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .alert-warning {
+      background-color: #ffc107;
+      color: #333;
+    }
+
+    .alert-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .dashboard-grid {
+      display: flex;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
     .dashboard-card {
       background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 25px 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
+
+    #totalOcorrenciasCard {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 4rem;
+      color: #0099AA;
+    }
+
+
+    .dashboard-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+    }
+
     .dashboard-card h3 {
       margin-top: 0;
-      border-bottom: 1px solid #eee;
+      border-bottom: 2px solid #eee;
       padding-bottom: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+      color: #022534;
     }
+
+    /* Total de ocorrências */
+    #totalOcorrencias {
+      font-size: 3rem;
+      color: #0099AA;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    /* Gráficos */
+    canvas {
+      max-width: 100%;
+      height: 300px !important;
+      border-radius: 8px;
+    }
+
+    /* Card que ocupa toda a largura do grid */
+    .dashboard-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Mapas */
     #mapaOcorrencias {
       height: 400px;
       width: 100%;
-      border-radius: 6px;
+      border-radius: 10px;
+    }
+
+    /* Responsivo */
+    @media (max-width: 600px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .content {
+      margin-left: 200px;
+      padding: 20px;
+    }
+
+    .sidebar {
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      background-color: #022534;
+      color: white;
     }
   </style>
+
 </head>
 
 <body>
@@ -48,9 +192,8 @@
           <li><a href="./register_occurrence.html">📝</a></li>
           <li><a href="./listar_ocorrencias.html">🔍</a></li>
           <li><a href="./minhas_ocorrencias.html">👔</a></li>
-           <li class="active"><a href="./dashboard.html">📊</a></li>
+          <li class="active"><a href="./dashboard.html">📊</a></li>
           <li><a href="#">❓</a></li>
-         
         </ul>
       </nav>
       <footer>
@@ -62,43 +205,105 @@
     <main class="content">
       <h2>Dashboard de Ocorrências</h2>
 
+      <!-- Métricas rápidas -->
+      <div class="dashboard-metrics">
+        <div class="metric-card" id="totalPendentes">
+          <div class="metric-icon">📌</div>
+          <div class="metric-info">
+            <h3>Pendentes</h3>
+            <p>0</p>
+          </div>
+        </div>
+
+        <div class="metric-card" id="totalResolvidas">
+          <div class="metric-icon">✅</div>
+          <div class="metric-info">
+            <h3>Resolvidas</h3>
+            <p>0</p>
+          </div>
+        </div>
+
+        <div class="metric-card" id="totalUsuarios">
+          <div class="metric-icon">👤</div>
+          <div class="metric-info">
+            <h3>Usuários Ativos</h3>
+            <p>0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alertas -->
+      <div class="dashboard-alerts" id="dashboardAlerts"></div>
+
       <div class="dashboard-grid">
-        <div class="dashboard-card">
+        <div class="dashboard-card" style="flex: 2;">
           <h3>Status das Ocorrências</h3>
           <canvas id="statusChart"></canvas>
         </div>
 
-        <div class="dashboard-card">
-          <h3>Total de Ocorrências</h3>
-          <h1 id="totalOcorrencias"></h1>
-        </div>
-        
-        <div class="dashboard-card" style="grid-column: 1 / -1;">
-          <h3>Ocorrências por Data</h3>
-          <canvas id="ocorrenciasPorDataChart"></canvas>
+        <div class="dashboard-card" id="totalOcorrenciasCard" style="flex: 1;">
+          <div>
+            <h3 style="text-align:center;">Total de Ocorrências</h3>
+            <h1 id="totalOcorrencias" style="text-align:center;">5</h1>
+          </div>
         </div>
       </div>
-    </main>
+
+      <div class="dashboard-card full-width">
+        <h3>Ocorrências por Data</h3>
+        <canvas id="ocorrenciasPorDataChart"></canvas>
+      </div>
+  </div>
+  </main>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       carregarDadosDashboard();
     });
 
     async function carregarDadosDashboard() {
       try {
         const response = await fetch('http://localhost:3000/ocorrencias');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const ocorrencias = await response.json();
 
         const ocorrenciasAtivas = ocorrencias.filter(oc => !oc.status || oc.status.toLowerCase() !== 'excluido');
 
-
+        // Atualiza total de ocorrências
         document.getElementById('totalOcorrencias').textContent = ocorrenciasAtivas.length;
 
+        // Atualiza métricas rápidas
+        const pendentes = ocorrenciasAtivas.filter(o => (o.status || 'pendente') === 'pendente').length;
+        const resolvidas = ocorrenciasAtivas.filter(o => (o.status || '') === 'concluido').length;
+        document.getElementById('totalPendentes').querySelector('p').textContent = pendentes;
+        document.getElementById('totalResolvidas').querySelector('p').textContent = resolvidas;
+
+        // Usuários ativos (exemplo)
+        const resUsers = await fetch('http://localhost:3000/usuarios');
+        const usuarios = await resUsers.json();
+        document.getElementById('totalUsuarios').querySelector('p').textContent = usuarios.length;
+
+        // Alertas
+        const alertsContainer = document.getElementById('dashboardAlerts');
+        alertsContainer.innerHTML = '';
+
+        if (pendentes > 0) {
+          const alert1 = document.createElement('div');
+          alert1.className = 'alert alert-warning';
+          alert1.textContent = `Você tem ${pendentes} ocorrências pendentes!`;
+          alertsContainer.appendChild(alert1);
+        }
+
+        const urgentesHoje = ocorrenciasAtivas.filter(o => o.status === 'pendente' && o.urgente === true).length;
+        if (urgentesHoje > 0) {
+          const alert2 = document.createElement('div');
+          alert2.className = 'alert alert-danger';
+          alert2.textContent = `${urgentesHoje} ocorrências urgentes precisam de atenção!`;
+          alertsContainer.appendChild(alert2);
+        }
+
+        // Gráficos
         gerarGraficoStatus(ocorrenciasAtivas);
         gerarGraficoOcorrenciasPorData(ocorrenciasAtivas);
 
@@ -110,73 +315,32 @@
 
     function gerarGraficoStatus(ocorrencias) {
       const ctx = document.getElementById('statusChart').getContext('2d');
-      const statusCounts = {
-        pendente: 0,
-        em_andamento: 0,
-        concluido: 0,
-        rejeitado: 0
-      };
-
-      ocorrencias.forEach(oc => {
-        const status = oc.status || 'pendente';
-        if (statusCounts.hasOwnProperty(status)) {
-          statusCounts[status]++;
-        }
-      });
+      const statusCounts = { pendente: 0, em_andamento: 0, concluido: 0, rejeitado: 0 };
+      ocorrencias.forEach(oc => { const status = oc.status || 'pendente'; if (statusCounts.hasOwnProperty(status)) statusCounts[status]++; });
 
       new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels: ['Pendente', 'Em Andamento', 'Concluído', 'Rejeitado'],
-          datasets: [{
-            label: 'Status das Ocorrências',
-            data: Object.values(statusCounts),
-            backgroundColor: [
-              '#ffc107',
-              '#17a2b8',
-              '#28a745',
-              '#dc3545'
-            ]
-          }]
+          datasets: [{ data: Object.values(statusCounts), backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#dc3545'] }]
         }
       });
     }
-    
+
     function gerarGraficoOcorrenciasPorData(ocorrencias) {
       const ctx = document.getElementById('ocorrenciasPorDataChart').getContext('2d');
       const dataCounts = {};
-
-      ocorrencias.forEach(oc => {
-          if (oc.data_ocorrencia) {
-              const data = oc.data_ocorrencia.split('T')[0]; 
-              dataCounts[data] = (dataCounts[data] || 0) + 1;
-          }
-      });
-
+      ocorrencias.forEach(oc => { if (oc.data_ocorrencia) { const data = oc.data_ocorrencia.split('T')[0]; dataCounts[data] = (dataCounts[data] || 0) + 1; } });
       const labels = Object.keys(dataCounts).sort();
       const data = labels.map(label => dataCounts[label]);
 
       new Chart(ctx, {
-          type: 'line',
-          data: {
-              labels: labels,
-              datasets: [{
-                  label: 'Número de Ocorrências por Dia',
-                  data: data,
-                  borderColor: '#007BFF',
-                  tension: 0.1,
-                  fill: false
-              }]
-          },
-          options: {
-              scales: {
-                  y: {
-                      beginAtZero: true
-                  }
-              }
-          }
+        type: 'line',
+        data: { labels: labels, datasets: [{ label: 'Número de Ocorrências por Dia', data: data, borderColor: '#007BFF', tension: 0.1, fill: false }] },
+        options: { scales: { y: { beginAtZero: true } } }
       });
     }
   </script>
 </body>
+
 </html>

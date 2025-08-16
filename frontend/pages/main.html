@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,50 +16,198 @@
     <script src="../../backend/node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
     <style>
-        .div-mapa {
-            height: 550px;
-            width: 1000px;
-            border-radius: 6px;
-            margin: 20px auto;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        .map-section {
+            background-color: #022534;
+            text-align: center;
+            margin: 40px auto;
+            max-width: 800px;
+            padding: 30px 20px;
+            border-radius: 12px;
         }
 
-        .leaflet-popup-content {
-            max-width: 250px;
+        .map-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #00BFFF;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 4px;
+        }
+
+        .map-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 3px;
+            width: 100%;
+            border-radius: 2px;
+            background-color: #00BFFF;
+        }
+
+        .div-mapa {
+            height: 400px;
+            width: 90%;
+            max-width: 1100px;
+            border-radius: 12px;
+            margin: 0 auto;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            border: 2px solid #0099AA;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+
+        .div-mapa:hover {
+            transform: scale(1.01);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 10px;
+            padding: 8px;
+            background: #fff;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #4CAF50;
+        }
+
+        .leaflet-popup-tip {
+            background: #4CAF50;
         }
 
         .popup-ocorrencia h3 {
             margin: 0 0 5px 0;
             font-size: 16px;
-            color: #333;
+            color: #2c3e50;
+            font-weight: 600;
         }
 
         .popup-ocorrencia p {
-            margin: 0 0 10px 0;
+            margin: 0 0 8px 0;
             font-size: 14px;
-            color: #666;
+            color: #555;
         }
 
         .popup-ocorrencia small {
             font-size: 12px;
-            color: #999;
+            color: #888;
         }
 
         .popup-imagens {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 6px;
             margin-top: 10px;
         }
 
         .popup-imagem {
             width: 100%;
-            height: auto;
-            border-radius: 4px;
+            max-height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
             border: 1px solid #ddd;
+            transition: transform 0.2s ease;
+        }
+
+        .popup-imagem:hover {
+            transform: scale(1.05);
+        }
+
+        .footer {
+            background-color: #022534;
+            color: #ddd;
+            padding: 40px 20px 20px;
+            font-size: 14px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 30px;
+        }
+
+        .footer-logo {
+            flex: 1;
+            text-align: left;
+        }
+
+        .footer-logo img {
+            max-width: 80px;
+            margin-bottom: 10px;
+        }
+
+        .footer-logo p {
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        /* Links centrais */
+        .footer-links {
+            flex: 1;
+            text-align: center;
+        }
+
+        .footer-links h4 {
+            color: #00BFFF;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-bottom: 2px solid #0099AA;
+            display: inline-block;
+            padding-bottom: 4px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links ul li a:hover {
+            color: #00BFFF;
+        }
+
+        .footer-contact {
+            flex: 1;
+            text-align: center;
+        }
+
+        .footer-contact h4 {
+            color: #00BFFF;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-bottom: 2px solid #0099AA;
+            display: inline-block;
+            padding-bottom: 4px;
+        }
+
+        .footer-contact p {
+            margin: 6px 0;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            border-top: 1px solid #044050;
+            margin-top: 20px;
+            padding-top: 10px;
+            color: #888;
+            font-size: 13px;
         }
     </style>
-    </head>
+</head>
 
 <body>
 
@@ -84,8 +233,9 @@
         <section class="hero">
             <div class="hero-content">
                 <h2>Transforme sua cidade.<br>Faça a diferença!</h2>
-                <p>Nos ajude a construir uma cidade melhor. Registre problemas urbanos, acompanhe as soluções e contribua com a melhoria do nosso município.</p>
-            <button class="btn-registrar"><a href="../register_occurrence.html">Registrar Ocorrências</a></button>
+                <p>Nos ajude a construir uma cidade melhor. Registre problemas urbanos, acompanhe as soluções e
+                    contribua com a melhoria do nosso município.</p>
+                <button class="btn-registrar"><a href="../register_occurrence.html">Registrar Ocorrências</a></button>
             </div>
         </section>
     </main>
@@ -104,35 +254,49 @@
         </div>
     </section>
 
-    <section>
+    <section class="map-section">
+        <h2 class="map-title">📍 Ocorrências na Cidade</h2>
         <div class="div-mapa" id="mapa-principal"></div>
     </section>
-        
-    <footer>
-        <div class="footer-logo">
-            <img src="../assets/icons/Logobrancasemfundo.png" alt="Logo">
-            <p><strong>Cidadão Atento</strong><br>Juntos construímos uma cidade melhor.</p>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="../assets/icons/Logobrancasemfundo.png" alt="Logo">
+                <p><strong>Cidadão Atento</strong><br>Juntos construímos uma cidade melhor.</p>
+            </div>
+
+            <div class="footer-links">
+                <h4>Links úteis</h4>
+                <ul>
+                    <li><a href="../register_occurrence.html">Registrar ocorrência</a></li>
+                    <li><a href="../listar_ocorrencias.html">Minhas ocorrências</a></li>
+                    <li><a href="#">Termos de Uso</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h4>Contato</h4>
+                <p><i class="fas fa-envelope"></i> suporte@cidadaoatento.com</p>
+                <p><i class="fas fa-phone"></i> (00) 00000-0000</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
         </div>
 
-        <div class="footer-links">
-            <h4>Links úteis</h4>
-            <ul>
-                <li><a href="../register_occurrence.html">Registrar ocorrência</a></li>
-                <li><a href="../listar_ocorrencias.html">Minhas ocorrências</a></li>
-                <li><a href="#">Termos de Uso</a></li>
-            </ul>
-        </div>
-
-        <div class="footer-contact">
-            <h4>Contato</h4>
-            <p>suporte@cidadaoatento.com<br>(00) 00000-0000</p>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Cidadão Atento — Todos os direitos reservados.</p>
         </div>
     </footer>
 
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const map = L.map('mapa-principal').setView([-23.5505, -46.6333], 12);
-            
+
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -145,13 +309,13 @@
 
                     const statusAExcluir = ['concluido', 'excluido'];
                     const ocorrenciasVisiveis = ocorrencias.filter(oc => oc.status && !statusAExcluir.includes(oc.status.toLowerCase()));
-                    
+
                     const markers = L.markerClusterGroup();
 
                     ocorrenciasVisiveis.forEach(oc => {
                         if (oc.latitude && oc.longitude) {
                             const marker = L.marker([oc.latitude, oc.longitude]).addTo(map);
-                            
+
                             markers.addLayer(marker);
 
                             marker.bindPopup(`
@@ -162,14 +326,14 @@
                         }
                     });
                     map.addLayer(markers);
-                    
+
                     if (ocorrenciasVisiveis.length > 0) {
-                        const group = new L.featureGroup(ocorrenciasVisiveis.map(oc => 
+                        const group = new L.featureGroup(ocorrenciasVisiveis.map(oc =>
                             L.marker([oc.latitude, oc.longitude])
                         ));
                         map.fitBounds(group.getBounds().pad(0.1));
                     }
-                    
+
                 } catch (error) {
                     console.error('Erro ao carregar ocorrências:', error);
                     alert('Não foi possível carregar as ocorrências. Tente novamente.');
@@ -181,4 +345,5 @@
     </script>
 
 </body>
+
 </html>

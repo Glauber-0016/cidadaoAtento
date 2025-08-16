@@ -1,32 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cidadão Atento</title>
   <link rel="stylesheet" href="./assets/css/listar.css" />
   <link rel="stylesheet" href="../backend/node_modules/leaflet/dist/leaflet.css" />
   <script src="../backend/node_modules/leaflet/dist/leaflet.js"></script>
 
   <style>
-
     .like-button {
-    cursor: pointer;
-    font-size: 22px;
-    color: #ccc;
-    transition: color 0.3s;
-    margin-left: 10px;
+      cursor: pointer;
+      font-size: 22px;
+      color: #ccc;
+      transition: color 0.3s;
+      margin-left: 10px;
     }
 
     .like-button.liked {
-    color: red;
+      color: red;
     }
 
-    .like-container {
-      
-    }
-
-    .status-container{
+    .status-container {
       margin-left: auto;
       position: absolute;
       right: 0;
@@ -39,6 +35,7 @@
       max-height: 200px;
       overflow-y: auto;
     }
+
     .comment {
       background-color: #f9f9f9;
       padding: 8px;
@@ -46,16 +43,19 @@
       border-radius: 6px;
       border: 1px solid #ddd;
     }
+
     .comment strong {
       display: block;
       color: #007BFF;
       margin-bottom: 4px;
     }
+
     .comment-form {
       display: flex;
       flex-direction: column;
       margin-top: 10px;
     }
+
     .comment-form input[type="text"],
     .comment-form textarea {
       padding: 8px;
@@ -64,6 +64,7 @@
       border-radius: 4px;
       font-size: 0.9rem;
     }
+
     .comment-form button {
       align-self: flex-start;
       padding: 6px 12px;
@@ -73,36 +74,64 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
     .comment-form button:hover {
       background-color: #007c8a;
     }
+
     .filters {
       display: flex;
-      gap: 15px;
-      margin-bottom: 20px;
-      padding: 15px;
-      background-color: #ffffff;
-      border-radius: 8px;
       flex-wrap: wrap;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      gap: 20px;
+      margin-bottom: 25px;
+      padding: 20px;
+      background: linear-gradient(135deg, #ffffff, #f0f4f7);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
       border: 1px solid #e0e0e0;
+      transition: all 0.3s ease;
     }
+
     .filter-group {
       display: flex;
       flex-direction: column;
+      min-width: 180px;
+      flex: 1;
     }
+
     .filter-group label {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #555;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      font-weight: 600;
     }
+
     .filter-group select,
     .filter-group input {
-      padding: 8px;
-      border: 1px solid #f9f9f9;
-      border-radius: 4px;
-      font-size: 0.9rem;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      background-color: #fff;
     }
+
+    .filter-group select:hover,
+    .filter-group input:hover,
+    .filter-group select:focus,
+    .filter-group input:focus {
+      border-color: #0099AA;
+      box-shadow: 0 2px 6px rgba(0, 153, 170, 0.3);
+      outline: none;
+    }
+
+    @media (max-width: 600px) {
+      .filters {
+        flex-direction: column;
+      }
+    }
+
+
     .status-badge {
       padding: 4px 10px;
       border-radius: 12px;
@@ -111,36 +140,70 @@
       font-weight: bold;
       text-transform: capitalize;
     }
-    .status-pendente { background-color: #ffc107; color: #333; }
-    .status-em_andamento { background-color: #17a2b8; }
-    .status-concluido { background-color: #28a745; }
-    .status-rejeitado { background-color: #dc3545; }
+
+    .status-pendente {
+      background-color: #ffc107;
+      color: #333;
+    }
+
+    .status-em_andamento {
+      background-color: #17a2b8;
+    }
+
+    .status-concluido {
+      background-color: #28a745;
+    }
+
+    .status-rejeitado {
+      background-color: #dc3545;
+    }
 
     main.content .card-list {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 20px;
     }
+
     .occurrence-card {
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       border: 1px solid #e0e0e0;
       padding: 15px;
       display: flex;
       flex-direction: column;
-      gap: 10px; /* Espaço entre os elementos internos do card */
-    }
-    .occurrence-image {
-        width: 100%;
-        height: auto;
-        border-radius: 6px;
-    }
-    .occurrence-map {
-        height: 180px;
-        border-radius: 6px;
+      gap: 10px;
+      /* Espaço entre os elementos internos do card */
     }
 
+    .occurrence-image {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    .occurrence-map {
+      height: 180px;
+      border-radius: 6px;
+    }
+
+    .content {
+      margin-left: 200px;
+      padding: 20px;
+    }
+
+    .sidebar {
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      background-color: #022534;
+      color: white;
+    }
   </style>
 </head>
 
@@ -169,7 +232,7 @@
 
     <main class="content">
       <h2>Ocorrências</h2>
-      
+
       <div class="filters">
         <div class="filter-group">
           <label for="filter-status">Filtrar por Status</label>
@@ -195,75 +258,75 @@
     const API_BASE_URL = 'http://localhost:3000';
     const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
     const ocorrenciasList = document.getElementById('ocorrenciasList');
-    
+
     const filterStatus = document.getElementById('filter-status');
     const filterData = document.getElementById('filter-data');
-    let todasAsOcorrencias = []; 
+    let todasAsOcorrencias = [];
 
     //pega o id do usuario
-    document.addEventListener('DOMContentLoaded', function() {
-        const usuarioLogado = verificarAutenticacao();
-        if (usuarioLogado) {
-            currentUserId = getUserId();
-        }
-        carregarOcorrencias();
+    document.addEventListener('DOMContentLoaded', function () {
+      const usuarioLogado = verificarAutenticacao();
+      if (usuarioLogado) {
+        currentUserId = getUserId();
+      }
+      carregarOcorrencias();
     });
 
-     async function toggleLike(ocorrenciaId, likeButton) {
-    
+    async function toggleLike(ocorrenciaId, likeButton) {
+
       if (!currentUserId) {
-          alert('Você precisa estar logado para curtir.');
-          return; 
+        alert('Você precisa estar logado para curtir.');
+        return;
       }
       try {
-          const res = await fetch(`${API_BASE_URL}/ocorrencias/${ocorrenciaId}/likes`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId: currentUserId }) 
-          });
+        const res = await fetch(`${API_BASE_URL}/ocorrencias/${ocorrenciaId}/likes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: currentUserId })
+        });
 
-          if (!res.ok) throw new Error('Falha ao processar o like.');
-          const likeCountSpan = likeButton.nextElementSibling;
-          let currentCount = parseInt(likeCountSpan.textContent);
+        if (!res.ok) throw new Error('Falha ao processar o like.');
+        const likeCountSpan = likeButton.nextElementSibling;
+        let currentCount = parseInt(likeCountSpan.textContent);
 
-          if (likeButton.classList.contains('liked')) {
-              likeButton.classList.remove('liked');
-              likeCountSpan.textContent = currentCount - 1;
-          } else {
-              likeButton.classList.add('liked');
-              likeCountSpan.textContent = currentCount + 1;
-          }
-
-        } catch (error) {
-          console.error('Erro ao curtir:', error);
-          alert('Não foi possível registrar sua curtida.');
+        if (likeButton.classList.contains('liked')) {
+          likeButton.classList.remove('liked');
+          likeCountSpan.textContent = currentCount - 1;
+        } else {
+          likeButton.classList.add('liked');
+          likeCountSpan.textContent = currentCount + 1;
         }
+
+      } catch (error) {
+        console.error('Erro ao curtir:', error);
+        alert('Não foi possível registrar sua curtida.');
       }
-      
+    }
 
 
-      async function carregarComentarios(ocorrenciaId, commentsContainer) {
-        try {
-          const res = await fetch(`${API_BASE_URL}/comentarios/${ocorrenciaId}`);
-          const comentarios = await res.json();
-          commentsContainer.innerHTML = '';
-          comentarios.forEach(c => {
-            const commentEl = document.createElement('div');
-            commentEl.className = 'comment';
-            commentEl.innerHTML = `<strong>${c.nome}</strong><p>${c.texto}</p>`;
-            commentsContainer.appendChild(commentEl);
-          });
-        } catch (err) {
-          commentsContainer.innerHTML = '<p>Erro ao carregar comentários.</p>';
-        }
+
+    async function carregarComentarios(ocorrenciaId, commentsContainer) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/comentarios/${ocorrenciaId}`);
+        const comentarios = await res.json();
+        commentsContainer.innerHTML = '';
+        comentarios.forEach(c => {
+          const commentEl = document.createElement('div');
+          commentEl.className = 'comment';
+          commentEl.innerHTML = `<strong>${c.nome}</strong><p>${c.texto}</p>`;
+          commentsContainer.appendChild(commentEl);
+        });
+      } catch (err) {
+        commentsContainer.innerHTML = '<p>Erro ao carregar comentários.</p>';
       }
+    }
 
-      function renderOcorrencias(ocorrencias) {
-        ocorrenciasList.innerHTML = '';
-        if (ocorrencias.length === 0) {
-          ocorrenciasList.innerHTML = '<p style="text-align: center;">Nenhuma ocorrência encontrada.</p>';
-          return;
-        }
+    function renderOcorrencias(ocorrencias) {
+      ocorrenciasList.innerHTML = '';
+      if (ocorrencias.length === 0) {
+        ocorrenciasList.innerHTML = '<p style="text-align: center;">Nenhuma ocorrência encontrada.</p>';
+        return;
+      }
 
       ocorrencias.forEach(oc => {
         const item = document.createElement('div');
@@ -271,15 +334,15 @@
 
         const statusText = (oc.status || 'pendente').replace('_', ' ');
         const statusClass = (oc.status || 'pendente').toLowerCase();
-        
 
-        
+
+
         const header = document.createElement('div');
         header.className = 'occurrence-header';
         header.style.display = 'flex';
-        header.style.justifyContent = 'space-between'; 
-        header.style.alignItems = 'center'; 
-        header.style.width = '100%'; 
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'center';
+        header.style.width = '100%';
 
         const titleContainer = document.createElement('div');
         titleContainer.innerHTML = `<strong>${oc.nome}</strong>`;
@@ -287,7 +350,7 @@
         const metaContainer = document.createElement('div');
         metaContainer.style.display = 'flex';
         metaContainer.style.alignItems = 'center';
-        metaContainer.style.gap = '15px'; 
+        metaContainer.style.gap = '15px';
 
         const userHasLiked = window.currentUserId && oc.likes.some(like => like.userId === window.currentUserId);
         const likedClass = userHasLiked ? 'liked' : '';
@@ -346,10 +409,10 @@
         `;
         commentForm.addEventListener('submit', async (e) => {
           e.preventDefault();
-          const body = { 
-            nome: commentForm.nome.value, 
-            texto: commentForm.texto.value, 
-            ocorrenciaId: oc.id 
+          const body = {
+            nome: commentForm.nome.value,
+            texto: commentForm.texto.value,
+            ocorrenciaId: oc.id
           };
 
           const res = await fetch(`${API_BASE_URL}/comentarios`, {
@@ -366,12 +429,12 @@
         });
         commentSection.appendChild(commentForm);
         item.appendChild(commentSection);
-        
+
         ocorrenciasList.appendChild(item);
         carregarComentarios(oc.id, commentsContainer);
       });
     }
-    
+
     function aplicarFiltros() {
       const statusValue = filterStatus.value;
       const dataValue = filterData.value;
@@ -410,4 +473,5 @@
     carregarOcorrencias();
   </script>
 </body>
+
 </html>
