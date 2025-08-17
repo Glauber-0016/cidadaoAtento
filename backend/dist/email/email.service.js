@@ -13,14 +13,18 @@ exports.MailService = void 0;
 // src/mail/mail.service.ts
 const common_1 = require("@nestjs/common");
 const nodemailer = require("nodemailer");
+const config_1 = require("@nestjs/config");
 let MailService = class MailService {
-    constructor() {
+    constructor(configService) {
+        this.configService = configService;
+        console.log('EMAIL_HOST from .env:', this.configService.get('EMAIL_HOST'));
         this.transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
+            host: this.configService.get('EMAIL_HOST'),
+            port: this.configService.get('EMAIL_PORT'),
+            secure: this.configService.get('EMAIL_SECURE') === 'true',
             auth: {
-                user: 'abbey45@ethereal.email',
-                pass: 'vy2cHM6X56j2mH8CNf',
+                user: this.configService.get('EMAIL_USER'),
+                pass: this.configService.get('EMAIL_PASS'),
             },
         });
     }
@@ -46,6 +50,6 @@ let MailService = class MailService {
 exports.MailService = MailService;
 exports.MailService = MailService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [config_1.ConfigService])
 ], MailService);
 //# sourceMappingURL=email.service.js.map

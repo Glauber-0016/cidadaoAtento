@@ -13,12 +13,14 @@ const auth_module_1 = require("./auth/auth.module");
 const ocorrencias_module_1 = require("./ocorrencias/ocorrencias.module");
 const comentario_module_1 = require("./comentarios/comentario.module");
 const like_module_1 = require("./likes/like.module");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            config_1.ConfigModule.forRoot(),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'mysql',
                 host: 'localhost',

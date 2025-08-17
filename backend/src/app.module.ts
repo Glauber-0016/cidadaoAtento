@@ -5,8 +5,12 @@ import { AuthModule } from './auth/auth.module';
 import { OcorrenciasModule } from './ocorrencias/ocorrencias.module';
 import { ComentariosModule } from './comentarios/comentario.module';
 import { LikesModule } from './likes/like.module';
+
+import { ConfigModule } from '@nestjs/config';
+
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',

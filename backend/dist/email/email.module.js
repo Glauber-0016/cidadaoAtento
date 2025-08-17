@@ -9,11 +9,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MailModule = void 0;
 const common_1 = require("@nestjs/common");
 const email_service_1 = require("../email/email.service");
+const config_1 = require("@nestjs/config");
 let MailModule = class MailModule {
 };
 exports.MailModule = MailModule;
 exports.MailModule = MailModule = __decorate([
     (0, common_1.Module)({
+        imports: [config_1.ConfigModule],
         providers: [email_service_1.MailService],
         exports: [email_service_1.MailService],
     })

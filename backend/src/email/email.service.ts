@@ -1,21 +1,23 @@
 // src/mail/mail.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailService {
   private transporter;
 
-  constructor() {
-    this.transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      auth: {
-        user: 'abbey45@ethereal.email',
-        pass: 'vy2cHM6X56j2mH8CNf',
-      },
-    });
-  }
+  constructor(private configService: ConfigService) {
+        this.transporter = nodemailer.createTransport({
+            host: this.configService.get('EMAIL_HOST'),
+            port: this.configService.get('EMAIL_PORT'),
+            secure: this.configService.get('EMAIL_SECURE') === 'true',
+            auth: {
+                user: this.configService.get('EMAIL_USER'),
+                pass: this.configService.get('EMAIL_PASS'),
+            },
+        });
+    }
 
   async sendStatusUpdateEmail(to: string, occurrenceName: string, newStatus: string) {
     const info = await this.transporter.sendMail({
