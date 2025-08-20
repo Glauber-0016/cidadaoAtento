@@ -131,8 +131,7 @@
       }
     }
 
-
-    .status-badge {
+    .status-badge, .priority-badge {
       padding: 4px 10px;
       border-radius: 12px;
       color: white;
@@ -141,22 +140,14 @@
       text-transform: capitalize;
     }
 
-    .status-pendente {
-      background-color: #ffc107;
-      color: #333;
-    }
+    .status-pendente { background-color: #ffc107; color: #333; }
+    .status-em_andamento { background-color: #17a2b8; }
+    .status-concluido { background-color: #28a745; }
+    .status-rejeitado { background-color: #dc3545; }
 
-    .status-em_andamento {
-      background-color: #17a2b8;
-    }
-
-    .status-concluido {
-      background-color: #28a745;
-    }
-
-    .status-rejeitado {
-      background-color: #dc3545;
-    }
+    .priority-baixa { background-color: #28a745; }
+    .priority-media { background-color: #ffc107; color: #333; }
+    .priority-alta { background-color: #dc3545; }
 
     main.content .card-list {
       display: grid;
@@ -173,7 +164,6 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      /* Espaço entre os elementos internos do card */
     }
 
     .occurrence-image {
@@ -262,12 +252,12 @@
     const filterStatus = document.getElementById('filter-status');
     const filterData = document.getElementById('filter-data');
     let todasAsOcorrencias = [];
+    let currentUserId = null;
 
-    //pega o id do usuario
     document.addEventListener('DOMContentLoaded', function () {
-      const usuarioLogado = verificarAutenticacao();
+      const usuarioLogado = typeof verificarAutenticacao === 'function' && verificarAutenticacao();
       if (usuarioLogado) {
-        currentUserId = getUserId();
+        currentUserId = typeof getUserId === 'function' ? getUserId() : null;
       }
       carregarOcorrencias();
     });
@@ -303,8 +293,6 @@
       }
     }
 
-
-
     async function carregarComentarios(ocorrenciaId, commentsContainer) {
       try {
         const res = await fetch(`${API_BASE_URL}/comentarios/${ocorrenciaId}`);
@@ -334,11 +322,11 @@
 
         const statusText = (oc.status || 'pendente').replace('_', ' ');
         const statusClass = (oc.status || 'pendente').toLowerCase();
-
-
+        
+        const prioridadeText = (oc.prioridade || 'media');
+        const prioridadeClass = (oc.prioridade || 'media').toLowerCase();
 
         const header = document.createElement('div');
-        header.className = 'occurrence-header';
         header.style.display = 'flex';
         header.style.justifyContent = 'space-between';
         header.style.alignItems = 'center';
@@ -350,16 +338,17 @@
         const metaContainer = document.createElement('div');
         metaContainer.style.display = 'flex';
         metaContainer.style.alignItems = 'center';
-        metaContainer.style.gap = '15px';
+        metaContainer.style.gap = '8px';
 
         const userHasLiked = window.currentUserId && oc.likes.some(like => like.userId === window.currentUserId);
         const likedClass = userHasLiked ? 'liked' : '';
 
         metaContainer.innerHTML = `
+            <span class="priority-badge priority-${prioridadeClass}">${prioridadeText}</span>
             <span class="status-badge status-${statusClass}">${statusText}</span>
             <div class="like-container" style="display: flex; align-items: center;">
                 <span class="like-button ${likedClass}" onclick="toggleLike(${oc.id}, this)">&#10084;</span>
-                <span class="like-count" style="margin-left: 5px;">${oc.likes.length}</span>
+                <span class="like-count" style="margin-left: 5px;">${oc.likes ? oc.likes.length : 0}</span>
             </div>
         `;
         header.appendChild(titleContainer);
