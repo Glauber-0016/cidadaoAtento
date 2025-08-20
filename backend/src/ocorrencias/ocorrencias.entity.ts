@@ -39,6 +39,9 @@ export class Ocorrencias {
   @Column({ default: 'pendente' }) 
   status: string;
 
+  @Column({ default: 'media' })
+  prioridade: string;
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)', name: 'data_ocorrencia' })
   data_ocorrencia: Date;
 

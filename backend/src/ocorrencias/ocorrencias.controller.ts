@@ -42,6 +42,16 @@ export class OcorrenciasController {
     return this.service.findAll();
   }
 
+  @Patch(':id/prioridade')
+  async updateOccurrencePrioridade(@Param('id') id: string, @Body() body: { prioridade: string }) {
+    try {
+      const updatedOccurrence = await this.service.updatePrioridade(id, body.prioridade);
+      return updatedOccurrence;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
   @Get('status/:status')
   findByStatus(@Param('status') status: string) {
     return this.service.findByStatus(status);

@@ -42,6 +42,17 @@ async updateStatus(id: string, newStatus: string): Promise<Ocorrencias> {
     return ocorrenciaToUpdate;
 }
   
+  async updatePrioridade(id: string, newPrioridade: string): Promise<Ocorrencias> {
+    const ocorrenciaToUpdate = await this.repo.preload({
+      id: parseInt(id, 10),
+    });
+    if (!ocorrenciaToUpdate) {
+      throw new NotFoundException(`Ocorrência com ID "${id}" não encontrada.`);
+    }
+    ocorrenciaToUpdate.prioridade = newPrioridade;
+
+    return this.repo.save(ocorrenciaToUpdate);
+  }
 
   create(data: Partial<Ocorrencias>) {
     const ocorrencia  = this.repo.create(data);
