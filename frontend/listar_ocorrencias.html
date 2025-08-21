@@ -276,22 +276,23 @@
         });
 
         if (!res.ok) throw new Error('Falha ao processar o like.');
-        const likeCountSpan = likeButton.nextElementSibling;
+        const likeCountSpan = likeButton.parentElement.querySelector('.like-count');
         let currentCount = parseInt(likeCountSpan.textContent);
 
         if (likeButton.classList.contains('liked')) {
-          likeButton.classList.remove('liked');
-          likeCountSpan.textContent = currentCount - 1;
+        likeButton.classList.remove('liked');
+        likeCountSpan.textContent = currentCount - 1;
         } else {
           likeButton.classList.add('liked');
           likeCountSpan.textContent = currentCount + 1;
         }
 
-      } catch (error) {
+        } catch (error) {
         console.error('Erro ao curtir:', error);
         alert('Não foi possível registrar sua curtida.');
-      }
     }
+  }
+
 
     async function carregarComentarios(ocorrenciaId, commentsContainer) {
       try {
@@ -340,7 +341,7 @@
         metaContainer.style.alignItems = 'center';
         metaContainer.style.gap = '8px';
 
-        const userHasLiked = window.currentUserId && oc.likes.some(like => like.userId === window.currentUserId);
+        const userHasLiked = currentUserId && oc.likes.some(like => like.userId === currentUserId);
         const likedClass = userHasLiked ? 'liked' : '';
 
         metaContainer.innerHTML = `
