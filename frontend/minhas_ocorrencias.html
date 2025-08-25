@@ -87,6 +87,80 @@
       color: white;
     }
 
+    .avaliacao-container {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+    }
+
+    .sistema-avaliacao {
+        margin-bottom: 10px;
+    }
+
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 5px;
+        margin: 10px 0;
+    }
+
+    .star-rating input {
+        display: none;
+    }
+
+    .star-rating label {
+        font-size: 24px;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: #ffc107;
+    }
+
+    .comentario-avaliacao {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        min-height: 80px;
+        margin-bottom: 10px;
+    }
+
+    .btn-avaliar {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn-avaliar:hover {
+        background-color: #218838;
+    }
+
+    .avaliacao-realizada {
+        background-color: #e8f5e8;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+
+    .avaliacao-realizada .nota {
+        color: #ffc107;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
   </style>
 
 </head>
@@ -180,6 +254,56 @@
                 <p>${oc.descricao}</p>
             `;
 
+            if (oc.status === 'concluido') {
+                if (oc.avaliacao) {
+                    oc.avaliacao = JSON.parse(oc.avaliacao);
+                    item.innerHTML += `
+                        <div class="avaliacao-realizada">
+                            <strong>Avaliação:</strong>
+                            <div class="nota">${'★'.repeat(oc.avaliacao.nota)}${'☆'.repeat(5 - oc.avaliacao.nota)}</div>
+                            ${oc.avaliacao.comentario ? `<p>"${oc.avaliacao.comentario}"</p>` : ''}
+                            <small>Avaliado em: ${new Date(oc.avaliacao.data_avaliacao).toLocaleDateString()}</small>
+                        </div>
+                    `;
+                } else {
+                    item.innerHTML += `
+                        <div class="avaliacao-container">
+                            <h4>Ocorrência Concluída</h4>
+                            <p>Avalie a qualidade do serviço:</p>
+                            
+                            <div class="sistema-avaliacao">
+                                <div class="star-rating">
+                                    <input type="radio" id="star5-${oc.id}" name="rating-${oc.id}" value="5">
+                                    <label for="star5-${oc.id}">★</label>
+                                    
+                                    <input type="radio" id="star4-${oc.id}" name="rating-${oc.id}" value="4">
+                                    <label for="star4-${oc.id}">★</label>
+                                    
+                                    <input type="radio" id="star3-${oc.id}" name="rating-${oc.id}" value="3">
+                                    <label for="star3-${oc.id}">★</label>
+                                    
+                                    <input type="radio" id="star2-${oc.id}" name="rating-${oc.id}" value="2">
+                                    <label for="star2-${oc.id}">★</label>
+                                    
+                                    <input type="radio" id="star1-${oc.id}" name="rating-${oc.id}" value="1">
+                                    <label for="star1-${oc.id}">★</label>
+                                </div>
+                                
+                                <textarea 
+                                    class="comentario-avaliacao" 
+                                    placeholder="Deixe um comentário sobre o serviço prestado (opcional)"
+                                    id="comentario-${oc.id}"
+                                ></textarea>
+                                
+                                <button class="btn-avaliar" onclick="enviarAvaliacao(${oc.id})">
+                                    Enviar Avaliação
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
             if (oc.imagens) {
                 oc.imagens.split(',').filter(Boolean).forEach(imgName => {
                     const img = document.createElement('img');
@@ -206,6 +330,50 @@
 
             minhasOcorrenciasList.appendChild(item);
         });
+    }
+
+    async function enviarAvaliacao(ocorrenciaId) {
+        try {
+            const notaInput = document.querySelector(`input[name="rating-${ocorrenciaId}"]:checked`);
+            
+            if (!notaInput) {
+                alert('Por favor, selecione uma nota de 1 a 5 estrelas');
+                return;
+            }
+
+            const nota = parseInt(notaInput.value);
+            const comentario = document.getElementById(`comentario-${ocorrenciaId}`).value;
+
+            console.log('Enviando avaliação para ocorrência:', ocorrenciaId, {nota, comentario});
+
+            const response = await fetch(`http://localhost:3000/ocorrencias/${ocorrenciaId}/avaliar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nota: nota,
+                    comentario: comentario
+                })
+            });
+
+            console.log('Resposta do servidor:', response.status);
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Avaliação enviada:', data);
+                alert('Avaliação enviada com sucesso!');
+                carregarMinhasOcorrencias(currentUserId);
+            } else {
+                const errorText = await response.text();
+                console.error('Erro na resposta:', errorText);
+                alert('Erro ao enviar avaliação: ' + (errorText || response.statusText));
+            }
+
+        } catch (error) {
+            console.error('Erro ao enviar avaliação:', error);
+            alert('Erro de conexão. Tente novamente.');
+        }
     }
 </script>
 </body>

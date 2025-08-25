@@ -15,6 +15,7 @@ import { MailModule } from '../email/email.module';
   ],
   providers: [OcorrenciasService],
   controllers: [OcorrenciasController],
+  exports: [OcorrenciasService],
 })
 export class OcorrenciasModule {}
 

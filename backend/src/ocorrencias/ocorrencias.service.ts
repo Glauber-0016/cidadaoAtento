@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -59,8 +59,12 @@ async updateStatus(id: string, newStatus: string): Promise<Ocorrencias> {
     return this.repo.save(ocorrencia );
   }
 
-  findAll() {
-    return this.repo.find({ relations: ['likes'] });
+  async findAll() {
+    const ocorrencias = await this.repo.find({ relations: ['likes'] });
+    return ocorrencias.map(oc => ({
+        ...oc,
+        avaliacao: oc.avaliacao ? JSON.parse(oc.avaliacao) : null
+    }));
   }
 
   findByUserId(userId: number) {
@@ -75,5 +79,41 @@ async updateStatus(id: string, newStatus: string): Promise<Ocorrencias> {
         where: { status },
         order: { data_ocorrencia: 'DESC' }
     });
+  }
+
+  async avaliarOcorrencia(id: number, nota: number, comentario?: string) {
+    const ocorrencia = await this.repo.findOne({
+        where: { id }
+    });
+
+    if (!ocorrencia) {
+        throw new NotFoundException('Ocorrência não encontrada');
+    }
+
+    if (ocorrencia.status !== 'concluido') {
+        throw new BadRequestException('Só é possível avaliar ocorrências concluídas');
+    }
+
+    const avaliacao = {
+      nota: nota,
+      comentario: comentario || '',
+      data_avaliacao: new Date().toISOString()
+    };
+
+    ocorrencia.avaliacao = JSON.stringify(avaliacao);
+
+    return this.repo.save(ocorrencia);
+  }
+
+  async findUserOcorrencias(userId: number) {
+    const ocorrencias = await this.repo.find({
+        where: { userId },
+        order: { data_ocorrencia: 'DESC' }
+    });
+
+    return ocorrencias.map(oc => ({
+        ...oc,
+        avaliacao: oc.avaliacao ? JSON.parse(oc.avaliacao) : null
+    }));
   }
 }

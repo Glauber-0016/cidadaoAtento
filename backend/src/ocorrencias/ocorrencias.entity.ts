@@ -51,6 +51,9 @@ export class Ocorrencias {
   @OneToMany(() => Like, like => like.ocorrencia) 
   likes: Like[];
 
+  @Column({ type: 'text', nullable: true })
+    avaliacao?: string; 
+
 }
 
 

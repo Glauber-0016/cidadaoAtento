@@ -115,6 +115,49 @@
       background-color: #022534;
       color: white;
     }
+
+    .avaliacao-container {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+    }
+
+    .sistema-avaliacao {
+        margin-bottom: 10px;
+    }
+
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 5px;
+        margin: 10px 0;
+    }
+
+    .comentario-avaliacao {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        min-height: 80px;
+        margin-bottom: 10px;
+    }
+
+    .avaliacao-realizada {
+        background-color: #e8f5e8;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+
+    .avaliacao-realizada .nota {
+        color: #ffc107;
+        font-weight: bold;
+        font-size: 18px;
+    }
   </style>
 </head>
 <body>
@@ -230,6 +273,19 @@
           </form>
         `;
         item.insertAdjacentHTML('beforeend', priorityFormHTML);
+
+        if (oc.avaliacao) {
+            const starRating = '★'.repeat(oc.avaliacao.nota) + '☆'.repeat(5 - oc.avaliacao.nota);
+            const avaliacaoHTML = `
+                <div class="avaliacao-realizada">
+                    <strong>Avaliação:</strong>
+                    <div class="nota">${starRating}</div>
+                    ${oc.avaliacao.comentario ? `<p>"${oc.avaliacao.comentario}"</p>` : ''}
+                    <small>Avaliado em: ${new Date(oc.avaliacao.data_avaliacao).toLocaleDateString()}</small>
+                </div>
+            `;
+            item.insertAdjacentHTML('beforeend', avaliacaoHTML);
+        }
 
         ocorrenciasList.appendChild(item);
       });

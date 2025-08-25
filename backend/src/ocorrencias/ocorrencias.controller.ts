@@ -61,4 +61,23 @@ export class OcorrenciasController {
   findOccurrencesByUser(@Param('userId') userId: string) {
     return this.service.findByUserId(parseInt(userId, 10));
   }
+
+  @Post(':id/avaliar')
+  async avaliarOcorrencia(@Param('id') id: string, @Body() body: any) {
+      const { nota, comentario } = body;
+      
+      if (!nota || nota < 1 || nota > 5) {
+          throw new BadRequestException('Nota deve ser entre 1 e 5');
+      }
+
+      if (comentario && comentario.length > 500) {
+          throw new BadRequestException('Comentário muito longo');
+      }
+
+      return this.service.avaliarOcorrencia(
+          parseInt(id),
+          nota,
+          comentario
+      );
+  }
 }
