@@ -11,7 +11,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
   });
 
   const data = await res.json();
-  alert(data.message || 'Erro');
+  //alert(data.message || 'Erro');
 
   const allowedDomain = '@cidadaoatento.com';
 

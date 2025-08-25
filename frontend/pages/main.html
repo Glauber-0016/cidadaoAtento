@@ -37,7 +37,7 @@
             padding-bottom: 4px;
         }
 
-        .map-title::after {
+        /*.map-title::after {
             content: "";
             position: absolute;
             left: 0;
@@ -46,7 +46,7 @@
             width: 100%;
             border-radius: 2px;
             background-color: #00BFFF;
-        }
+        }*/
 
         .div-mapa {
             height: 400px;
@@ -295,7 +295,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const map = L.map('mapa-principal').setView([-23.5505, -46.6333], 12);
+            const map = L.map('mapa-principal').setView([-11.303287, -41.855852], 14);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
