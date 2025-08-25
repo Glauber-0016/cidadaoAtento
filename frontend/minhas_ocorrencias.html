@@ -9,7 +9,6 @@
   <script src="../backend/node_modules/leaflet/dist/leaflet.js"></script>
   
   <style>
-
     .occurrence-map {
         height: 150px;
         width: 100%;
@@ -43,7 +42,7 @@
         margin-top: 5px;
     }
 
-  .status-badge {
+    .status-badge, .priority-badge {
       padding: 4px 10px;
       border-radius: 12px;
       font-size: 0.85em;
@@ -64,6 +63,11 @@
     .status-badge.status-excluido { 
         background-color: #af4242; 
     }
+
+    .priority-badge.priority-baixa { background-color: #28a745; }
+    .priority-badge.priority-media { background-color: #ffc107; color: #333; }
+    .priority-badge.priority-alta { background-color: #dc3545; }
+
 
     .content {
       margin-left: 200px;
@@ -122,13 +126,12 @@
     const IMAGES_BASE_URL = `${API_BASE_URL}/uploads/`;
     const minhasOcorrenciasList = document.getElementById('minhasOcorrenciasList');
     let currentUserId = null;
-    
-    //pega o ID do usuario
+
     document.addEventListener('DOMContentLoaded', function() {
-        const usuarioLogado = verificarAutenticacao();
+        const usuarioLogado = typeof verificarAutenticacao === 'function' && verificarAutenticacao();
 
         if (usuarioLogado) {
-            currentUserId = getUserId();
+            currentUserId = typeof getUserId === 'function' ? getUserId() : null;
             carregarMinhasOcorrencias(currentUserId);
         } else {
             minhasOcorrenciasList.innerHTML = '<p>Você precisa estar logado para ver suas ocorrências. Faça o login e volte para esta página.</p>';
@@ -164,10 +167,15 @@
             const item = document.createElement('div');
             item.className = 'occurrence-card';
             const statusText = (oc.status || 'pendente').replace('_', ' ');
+            const prioridadeText = (oc.prioridade || 'media');
+            
             item.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <strong>${oc.nome}</strong>
-                    <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+                    <div style="display: flex; gap: 8px;">
+                        <span class="priority-badge priority-${oc.prioridade || 'media'}">${prioridadeText}</span>
+                        <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+                    </div>
                 </div>
                 <p>${oc.descricao}</p>
             `;

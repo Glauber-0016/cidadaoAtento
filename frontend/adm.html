@@ -46,7 +46,12 @@
       border-radius: 6px;
     }
 
-    .status-badge {
+    .badge-container {
+      display: flex;
+      gap: 8px;
+    }
+
+    .status-badge, .priority-badge {
       padding: 4px 10px;
       border-radius: 12px;
       color: white;
@@ -58,8 +63,12 @@
     .status-badge.status-em_andamento { background-color: #17a2b8; }
     .status-badge.status-concluido { background-color: #28a745; }
     .status-badge.status-excluido { background-color: #af4242; }
+    
+    .priority-badge.priority-baixa { background-color: #28a745; }
+    .priority-badge.priority-media { background-color: #ffc107; color: #333; }
+    .priority-badge.priority-alta { background-color: #dc3545; }
 
-    .status-update-form {
+    .update-form {
       margin-top: 10px;
       padding-top: 10px;
       border-top: 1px solid #f0f0f0;
@@ -69,14 +78,14 @@
       flex-wrap: wrap;
     }
 
-    .status-update-form select {
+    .update-form select {
       padding: 6px;
       border-radius: 5px;
       border: 1px solid #ccc;
       font-size: 0.9rem;
     }
 
-    .status-update-form button {
+    .update-form button {
       padding: 6px 12px;
       border: none;
       background-color: #0099AA;
@@ -85,7 +94,7 @@
       cursor: pointer;
     }
 
-    .status-update-form button:hover {
+    .update-form button:hover {
       background-color: #007c8a;
     }
 
@@ -138,10 +147,11 @@
 
   <script>
     const IMAGES_BASE_URL = 'http://localhost:3000/uploads/';
+    const API_BASE_URL = 'http://localhost:3000';
     const ocorrenciasList = document.getElementById('ocorrenciasList');
 
     async function carregarOcorrencias() {
-      const res = await fetch('http://localhost:3000/ocorrencias');
+      const res = await fetch(`${API_BASE_URL}/ocorrencias`);
       const ocorrencias = await res.json();
 
       ocorrenciasList.innerHTML = ''; 
@@ -151,12 +161,16 @@
         item.className = 'occurrence-card';
 
         const statusText = (oc.status || 'pendente').replace('_', ' ');
+        const prioridadeText = (oc.prioridade || 'media');
 
         // Cabeçalho do card
         const headerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <strong>${oc.nome}</strong>
-            <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+            <div class="badge-container">
+                <span class="priority-badge priority-${oc.prioridade || 'media'}">${prioridadeText}</span>
+                <span class="status-badge status-${oc.status || 'pendente'}">${statusText}</span>
+            </div>
           </div>
           <p>${oc.descricao}</p>
         `;
@@ -191,43 +205,59 @@
         }
 
         // Formulário de atualização de status
-        const formHTML = `
-          <form class="status-update-form" data-id="${oc.id}">
+        const statusFormHTML = `
+          <form class="update-form" data-id="${oc.id}" data-type="status">
             <select name="status">
               <option value="pendente" ${oc.status === 'pendente' ? 'selected' : ''}>Pendente</option>
               <option value="em_andamento" ${oc.status === 'em_andamento' ? 'selected' : ''}>Em Andamento</option>
               <option value="concluido" ${oc.status === 'concluido' ? 'selected' : ''}>Concluído</option>
               <option value="excluido" ${oc.status === 'excluido' ? 'selected' : ''}>Excluído</option>
             </select>
-            <button type="submit">Atualizar</button>
+            <button type="submit">Atualizar Status</button>
           </form>
         `;
-        item.insertAdjacentHTML('beforeend', formHTML);
+        item.insertAdjacentHTML('beforeend', statusFormHTML);
+
+        // Formulário de atualização de prioridade
+        const priorityFormHTML = `
+          <form class="update-form" data-id="${oc.id}" data-type="prioridade">
+            <select name="prioridade">
+              <option value="baixa" ${oc.prioridade === 'baixa' ? 'selected' : ''}>Baixa</option>
+              <option value="media" ${oc.prioridade === 'media' ? 'selected' : ''}>Média</option>
+              <option value="alta" ${oc.prioridade === 'alta' ? 'selected' : ''}>Alta</option>
+            </select>
+            <button type="submit">Atualizar Prioridade</button>
+          </form>
+        `;
+        item.insertAdjacentHTML('beforeend', priorityFormHTML);
 
         ocorrenciasList.appendChild(item);
       });
     }
 
-    // Atualizar status
+    // Event listener genérico para atualização
     ocorrenciasList.addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.target;
-      if (!form.classList.contains('status-update-form')) return;
+      if (!form.classList.contains('update-form')) return;
 
-      const occurrenceId = form.dataset.id; 
-      const newStatus = form.querySelector('select[name="status"]').value;
+      const occurrenceId = form.dataset.id;
+      const updateType = form.dataset.type; // "status" ou "prioridade"
+      const select = form.querySelector('select');
+      const newValue = select.value;
+      
       const submitButton = form.querySelector('button');
       submitButton.disabled = true;
 
       try {
-        const res = await fetch(`http://localhost:3000/ocorrencias/${occurrenceId}/status`, {
+        const res = await fetch(`${API_BASE_URL}/ocorrencias/${occurrenceId}/${updateType}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: newStatus })
+          body: JSON.stringify({ [updateType]: newValue })
         });
 
         if (res.ok) {
-          alert('Status atualizado com sucesso!');
+          alert(`${updateType.charAt(0).toUpperCase() + updateType.slice(1)} atualizado com sucesso!`);
           carregarOcorrencias(); 
         } else {
           const errorData = await res.json();
@@ -235,6 +265,7 @@
         }
       } catch (error) {
         alert(`Falha ao atualizar: ${error.message}`);
+      } finally {
         submitButton.disabled = false;
       }
     });
